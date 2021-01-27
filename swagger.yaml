@@ -30,10 +30,6 @@ paths:
         - type: string
           required: true
           in: query
-          name: mail
-        - type: string
-          required: true
-          in: query
           name: password
       responses:
         '201':
