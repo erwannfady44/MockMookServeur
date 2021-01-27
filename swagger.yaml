@@ -1,0 +1,74 @@
+swagger: '2.0'
+info:
+  title: Mock Mook
+  version: 1.0.0
+  description: Site de cours en ligne
+# host: '82.64.1.152:3000'
+# basePath: /api/
+# schemes:
+#   - http
+tags:
+  - name: user
+    description: Gestion des utilisateurs
+paths:
+  /user/signup:
+    post:
+      tags:
+        - user
+      summary: Enregistrer un nouvel utilisateur
+      parameters:
+        - type: string
+          required: true
+          in: query
+          name: pseudo
+        - type: string
+          required: true
+          in: query
+          name: mail
+        - type: string
+          required: true
+          in: query
+          name: password
+      responses:
+        '201':
+          description: utilisateur ajouté avec succès
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+              id:
+                type: string
+        '403':
+          description: L'utilisateur ne peut être crée
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: Connecter un utilisateur
+      parameters:
+        - name: mail
+          type: string
+          required: true
+          in: query
+        - type: string
+          required: true
+          in: query
+          name: password
+      responses:
+        '200':
+          description: utilisateur connecté avec succès
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+              id:
+                type: string
+        '401':
+          description: mot de passe incorrecte
+        '404':
+          description: adresse mail incorrecte
+# Added by API Auto Mocking Plugin
+host: localhost:3000
+basePath: /api
