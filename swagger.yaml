@@ -123,8 +123,160 @@ paths:
                 description: nom de la ressources non trouvée
                 example: path
 
+  /path:
+    put:
+      tags:
+        - Path
+      summary: ajouter un parcours
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: Titre
+          description: titre du parcours
+          type: string
+          in: query
+          required: true
+        - name: Description
+          type: string
+          in: query
+          required: true
+        - name: Pseudo
+          type: string
+          in: query
+          required: true
+        - name: token
+          type: string
+          description: Token d'autentification à mettre dans l'entête Authorisation
+          in: header
+          required: true
 
 
+      responses:
+        '201':
+          description: le parcours a été ajouté avec succès
+        '401':
+          description: Erreur d'authentification
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              not-found:
+                type: string
+                description: nom de la ressources non trouvée
+                example: path
+
+    get:
+      tags:
+        - Path
+      summary: Donne la liste de tous les parcours
+
+      responses:
+        '200':
+          description: le parcours a été trouvé avec succès
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              not-found:
+                type: string
+                description: nom de la ressources non trouvée
+                example: path
+
+  /path/{idPath}/:
+    put:
+      tags:
+        - Path
+      summary: modifie un parcours
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: Titre
+          description: titre du parcours
+          type: string
+          in: query
+          required: true
+        - name: Description
+          type: string
+          in: query
+          required: true
+        - name: Pseudo
+          type: string
+          in: query
+          required: true
+        - name: token
+          type: string
+          description: Token d'autentification à mettre dans l'entête Authorisation
+          in: header
+          required: true
+
+
+      responses:
+        '201':
+          description: le parcours a été modifié avec succès
+        '401':
+          description: Erreur d'authentification
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              not-found:
+                type: string
+                description: nom de la ressources non trouvée
+                example: path
+
+    get:
+      tags:
+        - Path
+      summary: Donne le parcours possédant idPath
+
+      responses:
+        '200':
+          description: le parcours a été trouvé avec succès
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              not-found:
+                type: string
+                description: nom de la ressources non trouvée
+                example: path
+    delete:
+      tags:
+        - Path
+        summary: Supprime le parcours possédant idPath
+        parameter:
+          - name: idPath
+            type: string
+            in: path
+            required: true
+          - name: Pseudo
+            type: string
+            in: query
+            required: true
+          - name: token
+            type: string
+            description: Token d'autentification à mettre dans l'entête Authorisation
+            in: header
+            required: true
+
+      responses:
+        '200':
+          description: le parcours a été supprimé avec succès
+        '401':
+          description: Erreur d'authentification
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              not-found:
+                type: string
+                description: nom de la ressources non trouvée
+                example: path
 
 
 host: localhost:3000
