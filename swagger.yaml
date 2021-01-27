@@ -173,7 +173,6 @@ paths:
                 type: string
                 description: nom de la ressources non trouvée
                 example: path
-        '
 
   /path:
     put:
@@ -278,7 +277,6 @@ paths:
                 type: string
                 description: nom de la ressources non trouvée
                 example: path
-
     get:
       tags:
         - Path
@@ -296,24 +294,24 @@ paths:
                 type: string
                 description: nom de la ressources non trouvée
                 example: path
+
     delete:
       tags:
         - Path
-        summary: Supprime le parcours possédant idPath
-        parameter:
-          - name: idPath
-            type: string
-            in: path
-            required: true
-          - name: Pseudo
-            type: string
-            in: query
-            required: true
-          - name: token
-            type: string
-            description: Token d'autentification à mettre dans l'entête Authorisation
-            in: header
-            required: true
+      summary: Supprime le parcours possédant idPath
+      security:
+        - basicAuth: [ ]
+
+      parameters:
+        - name: pseudo
+          type: string
+          in: query
+          required: true
+        - name: token
+          type: string
+          description: Token d'autentification à mettre dans l'entête Authorisation
+          in: header
+          required: true
 
       responses:
         '200':
