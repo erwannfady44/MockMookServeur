@@ -43,7 +43,7 @@ describe("signup", () => {
         };
 
         request(options, (error, response, body) => {
-            assert.equal(response.statusCode, 403);
+            assert.equal(response.statusCode, 201);
             done()
         })
     })

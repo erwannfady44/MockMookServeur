@@ -1,4 +1,4 @@
-GET /localhost:3000/api/
-
+POST /localhost:3000/api/
+form
 ###
 GET /api/user/signup
