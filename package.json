@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "cors": "^2.8.5",
+    "mongoose-unique-validator": "^2.0.3",
     "swagger-ui-express": "^4.1.6",
     "yamljs": "^0.3.0"
   }
