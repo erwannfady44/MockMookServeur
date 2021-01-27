@@ -3,10 +3,6 @@ info:
   title: Mock Mook
   version: 1.0.0
   description: Site de cours en ligne
-# host: '82.64.1.152:3000'
-# basePath: /api/
-# schemes:
-#   - http
 tags:
   - name: user
     description: Gestion des utilisateurs
