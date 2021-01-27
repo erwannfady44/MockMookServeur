@@ -1,0 +1,4 @@
+GET /localhost:3000/api/
+
+###
+GET /api/user/signup
