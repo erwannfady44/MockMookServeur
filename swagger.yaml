@@ -6,7 +6,7 @@ info:
 tags:
   - name: User
     description: Gestion des utilisateurs
-  - name: Classes
+  - name: Classe
     description: Gestion des cours
   - name: Path
     description: Gestion des parcours
@@ -75,10 +75,10 @@ paths:
           description: mot de passe incorrecte
         '404':
           description: adresse mail incorrecte
-  /classes:
+  /classe:
     put:
       tags:
-        - Classes
+        - Classe
       summary: ajouter un cours
       security:
         - basicAuth: [ ]
@@ -122,6 +122,58 @@ paths:
                 type: string
                 description: nom de la ressources non trouvée
                 example: path
+  /classe/{classe}:
+    put:
+      tags:
+        - Classe
+      summary: modifier un cours
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: idClasse
+          type: string
+          required: true
+          in: path
+        - name: title
+          description: titre du cours
+          type: string
+          in: query
+          required: true
+        - name: description
+          type: string
+          in: query
+          required: true
+        - name: pseudo
+          type: string
+          in: query
+          required: true
+        - name: token
+          type: string
+          description: Token d'autentification à mettre dans l'entête Authorization
+          in: header
+          required: true
+        - name: path
+          description: Parcours au quel le cours est lié
+          type: string
+          in: header
+          required: false
+
+
+      responses:
+        '201':
+          description: le cours a été ajouté avec succès
+        '401':
+          description: Erreur d'authentification
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              not-found:
+                type: string
+                description: nom de la ressources non trouvée
+                example: path
+        '
 
 
 
