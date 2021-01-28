@@ -554,7 +554,35 @@ paths:
           description: Impossible de supprimer la ressource
         404:
           description: Ressource non existante
-
+  /classe/findByKeyWord:
+    get:
+      tags:
+        - Classe
+      parameters:
+        - name : keyWord
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Retourne la liste des cours contenant le mot recherché
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: NodeJS
+                description:
+                  type: string
+                  example: NodeJS, un framework JavaScrip
+                creator:
+                  type: string
+                path:
+                  type: string
+        404:
+          description: Aucun cours trouvé
 
 
 host: localhost:3000
