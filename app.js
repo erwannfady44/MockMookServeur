@@ -34,8 +34,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// app.use(cors({origin: 'http://localhost:4200'}));
-// app.use(cors({origin: ''}));
+app.use(cors({origin: 'http://localhost:4200'}));
 app.use('/api', indexRouter);
 app.use('/api/user', userRouter);
 app.use('/api-docs/', swaggerUi.serve);
