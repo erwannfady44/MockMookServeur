@@ -15,6 +15,7 @@ exports.signup = (req, res, next) => {
             user.save()
                 .then(user => {
                     res.status(201).json({
+                        idUser: user._id,
                         token: jwt.sign(
                             {idUser: user._id, pseudo: user.pseudo},
                             keyToken,
@@ -23,7 +24,7 @@ exports.signup = (req, res, next) => {
                     });
                 })
                 .catch(error => res.status(403).json({
-                    error: error.message
+                    error: "Pseudo already use"
                 }));
         })
         .catch(error => {
