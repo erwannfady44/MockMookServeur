@@ -6,8 +6,9 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const yaml = require('yamljs');
-const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
+const classesRouter = require('./routes/classes');
+const pathRouter = require('./routes/path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = yaml.load('./swagger.yaml');
 
@@ -34,9 +35,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use(cors({origin: 'http://localhost:4200'}));
-app.use('/api', indexRouter);
+app.use(cors({origin: 'http://localhost'}));
+
 app.use('/api/user', userRouter);
+app.use('/api/classes', classesRouter);
+app.use('/api/path', pathRouter);
 app.use('/api-docs/', swaggerUi.serve);
 app.get('/api-docs/', swaggerUi.setup(swaggerDocument));
 

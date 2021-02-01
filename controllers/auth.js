@@ -6,9 +6,9 @@ module.exports = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, keyToken);
-        const pseudo = decodedToken.pseudo;
+        const idUser = decodedToken.idUser;
 
-        if (req.body.pseudo && req.body.pseudo !== pseudo)
+        if (req.body.pseudo && req.body.idUser !== idUser)
             throw 'Wrong pseudo';
         else
             next();

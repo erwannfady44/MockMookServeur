@@ -33,7 +33,13 @@ exports.add = (req, res, next) => {
 }
 
 exports.getAll = (req, res, next) => {
-
+    Classes.find({})
+        .then((classes) => {
+            res.status(200).json({classes: classes});
+        })
+        .catch(error => {
+            res.status(500).json({error: error.message});
+        })
 }
 
 exports.edit = (req, res, next) => {
