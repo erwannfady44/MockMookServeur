@@ -1,0 +1,16 @@
+path.add :
+    code 403, 500 à rajouter
+
+path.getAll:
+    code 500 à rajouter
+
+path.edit:
+    code 500 à rajouter
+
+path.getOne
+    retourne id, titre, description et pseudo et non un parcour
+    code 403 et 405 à rajouter
+
+path.delete
+    pas de pseudo en paramètre
+    code 403 à rajouter

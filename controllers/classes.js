@@ -42,6 +42,20 @@ exports.getAll = (req, res, next) => {
         })
 }
 
+exports.getClasses = (req, res, next) => {
+    Path.findOne({_id: req.body.idPath})
+        .then((path) => {
+            Classes.find({idPath: path.idPath})
+                .then((classes) => {
+                    res.status(200).json({classes: classes});
+                })
+                .catch(error => {
+                    res.status(500).json({error: error.message});
+                })
+        })
+        .catch((err) => res.status(404).json({error: err.message}))
+}
+
 exports.edit = (req, res, next) => {
 
 }
