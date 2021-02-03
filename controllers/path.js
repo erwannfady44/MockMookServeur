@@ -27,7 +27,23 @@ exports.add = (req, res, next) => {
 exports.getAll = (req, res, next) => {
     Path.find({})
         .then((paths) => {
-            res.status(200).json({paths: paths});
+            let json = [];
+            // TODO : Optimiser
+            let i = 0;
+            paths.forEach(path => {
+                User.findOne({_id: path.idCreator})
+                    .then(user => {
+                        json.push({
+                            title: path.title,
+                            description: path.description,
+                            pseudo: user.pseudo,
+                        });
+                        i++;
+                        if (i === paths.length - 1)
+                            res.status(200).json({json});
+                    })
+            })
+
         })
         .catch(error => {
             res.status(500).json({error: error.message});
