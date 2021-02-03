@@ -51,15 +51,64 @@ exports.getAll = (req, res, next) => {
 }
 
 exports.edit = (req, res, next) => {
-
+    User.findOne({_id: req.body.idUser})
+        .then((user) => {
+            Path.findOne({_id: req.body.idPath})
+                .then((path) => {
+                    path.title = req.body.title;
+                    path.description = req.body.description;
+                    res.status(200).json();
+                })
+                .catch(error => {
+                    res.status(404).json({error: error.message});
+                })
+        })
+        .catch(error => {
+            res.status(403).json({error: error.message});
+        })
 }
 
 exports.getOne = (req, res, next) => {
-
+    User.findOne({_id: req.body.idUser})
+        .then((user) => {
+            Path.findOne({_id: req.body.idPath})
+                .then((path) => {
+                    User.findOne({pseudo: path.idCreator})
+                        .then((pseudo) => {
+                            res.status(200).json({
+                                idPath: path.idPath,
+                                title: path.title,
+                                description: path.description,
+                                pseudo: pseudo
+                            });
+                        })
+                        .catch(error => {
+                            res.status(405).json({error: error.message});
+                        })
+                })
+                .catch(error => {
+                    res.status(404).json({error: error.message});
+                })
+        })
+        .catch(error => {
+            res.status(403).json({error: error.message});
+        })
 }
 
 exports.delete = (req, res, next) => {
-
+    User.findOne({_id: req.body.idUser})
+        .then((user) => {
+            Path.deleteOne({_id: req.body.idPath})
+                .then(() => {
+                    res.status(200).json();
+                })
+                .catch(error => {
+                    res.status(404).json({error: error.message});
+                })
+        })
+        .catch(error => {
+            res.status(403).json({error: error.message});
+        })
 }
 
 exports.findByKeyWord = (req, res, next) => {
