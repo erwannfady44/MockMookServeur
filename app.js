@@ -27,6 +27,7 @@ app.use((req, res, next) => {
     next();
 });
 
+app.disable('etag');
 
 app.use(logger('dev'));
 app.use(express.json());
