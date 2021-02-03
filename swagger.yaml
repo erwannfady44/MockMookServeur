@@ -3,6 +3,8 @@ info:
   title: Mock Mook
   version: 1.0.0
   description: Site de cours en ligne
+schemes:
+  - http
 tags:
   - name: User
     description: Gestion des utilisateurs

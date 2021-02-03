@@ -35,7 +35,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use(cors({origin: 'http://localhost'}));
+app.use(cors({origin: '*'}));
+//app.use(cors({origin: 'http://localhost:4200'}));
 
 app.use('/api/user', userRouter);
 app.use('/api/classes', classesRouter);
