@@ -11,7 +11,8 @@ exports.add = (req, res, next) => {
                 let path = new Path({
                     idCreator: user._id,
                     title: req.body.title,
-                    description: req.body.description
+                    description: req.body.description,
+                    date: Date.now()
                 })
                 path.save()
                     .then(() => res.status(201).json())
@@ -25,7 +26,7 @@ exports.add = (req, res, next) => {
 }
 
 exports.getAll = (req, res, next) => {
-    Path.find({})
+    Path.find({}).sort({date: -1})
         .then((paths) => {
             let json = [];
             // TODO : Optimiser
@@ -37,9 +38,10 @@ exports.getAll = (req, res, next) => {
                             title: path.title,
                             description: path.description,
                             pseudo: user.pseudo,
+                            idPath: path._id
                         });
                         i++;
-                        if (i === paths.length - 1)
+                        if (i === paths.length)
                             res.status(200).json({json});
                     })
             })
