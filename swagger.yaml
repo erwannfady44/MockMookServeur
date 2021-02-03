@@ -85,7 +85,6 @@ paths:
           description: title du cours
           type: string
           in: query
-          required: true
         - name: description
           type: string
           in: query
@@ -168,7 +167,6 @@ paths:
           description: title du cours
           type: string
           in: query
-          required: true
         - name: description
           type: string
           in: query
@@ -275,7 +273,6 @@ paths:
         - name: description
           type: string
           in: query
-          required: true
         - name: pseudo
           type: string
           in: query
@@ -305,6 +302,7 @@ paths:
       tags:
         - Path
       summary: Donne la liste de tous les parcours
+
 
       responses:
         '200':
@@ -337,7 +335,6 @@ paths:
         - name: description
           type: string
           in: query
-          required: true
         - name: pseudo
           type: string
           in: query
@@ -367,6 +364,11 @@ paths:
       tags:
         - Path
       summary: Donne le parcours possédant idPath
+      parameters:
+        - name: idPath
+          type: string
+          in: path
+          required: true
 
       responses:
         '200':
@@ -440,7 +442,6 @@ paths:
         - name: description
           type: string
           in: query
-          required: true
         - name: token
           type: string
           in: header
@@ -488,6 +489,9 @@ paths:
         - name: pseudo
           type: string
           required: true
+          in: query
+        - name: description
+          type: string
           in: query
         - name : token
           type: string
