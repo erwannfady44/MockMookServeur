@@ -6,7 +6,7 @@ exports.add = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
             if (user.status === 0) {
-                res.status(403).json({error: "Student cannot create Path"});
+                res.status(403).json({error: "Student cannot create Paths"});
             } else {
                 let path = new Path({
                     idCreator: user._id,
@@ -20,7 +20,7 @@ exports.add = (req, res, next) => {
             }
         })
         .catch((error) => {
-            res.status(500).json({error: error.message})
+            res.status(401).json({error: error.message})
         })
 }
 
@@ -34,6 +34,7 @@ exports.getAll = (req, res, next) => {
                 User.findOne({_id: path.idCreator})
                     .then(user => {
                         json.push({
+                            idPath: path.idPath,
                             title: path.title,
                             description: path.description,
                             pseudo: user.pseudo,
@@ -46,68 +47,87 @@ exports.getAll = (req, res, next) => {
 
         })
         .catch(error => {
-            res.status(500).json({error: error.message});
+            res.status(401).json({error: error.message});
         })
 }
 
 exports.edit = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Path.findOne({_id: req.body.idPath})
-                .then((path) => {
-                    path.title = req.body.title;
-                    path.description = req.body.description;
-                    res.status(200).json();
-                })
-                .catch(error => {
-                    res.status(404).json({error: error.message});
-                })
+            if (user.status === 0) {
+                res.status(403).json({error: "Student cannot edit Paths"});
+            } else {
+                Path.findOne({_id: req.params.idPath})
+                    .then((path) => {
+                        path.title = req.params.title;
+                        path.description = req.params.description;
+                        res.status(200).json();
+                    })
+                    .catch(error => {
+                        res.status(404).json({error: error.message});
+                    })
+            }
         })
         .catch(error => {
-            res.status(403).json({error: error.message});
+            res.status(401).json({error: error.message});
         })
 }
 
 exports.getOne = (req, res, next) => {
-    User.findOne({_id: req.body.idUser})
-        .then((user) => {
-            Path.findOne({_id: req.body.idPath})
-                .then((path) => {
-                    User.findOne({pseudo: path.idCreator})
-                        .then((pseudo) => {
-                            res.status(200).json({
-                                idPath: path.idPath,
-                                title: path.title,
-                                description: path.description,
-                                pseudo: pseudo
-                            });
-                        })
-                        .catch(error => {
-                            res.status(405).json({error: error.message});
-                        })
+    Path.findOne({_id: req.params.idPath})
+        .then((path) => {
+            Classes.find({_id: req.params.idPath})
+                .then((classes) => {
+                    let tab = [];
+                    // TODO : Optimiser
+                    let i = 0;
+                    classes.forEach(classe => {
+                        User.findOne({_id: classe.idCreator})
+                            .then((user) => {
+                                tab.push({
+                                    idClasses: classe.idClasses,
+                                    title: classe.title,
+                                    description: classe.description,
+                                    pseudo: user.pseudo
+                                })
+                                i++;
+                                if (i === classes.length - 1)
+                                    res.status(200).json({
+                                        idPath: path.idPath,
+                                        title: path.title,
+                                        description: path.description,
+                                        classes: tab
+                                    });
+                            })
+                    })
                 })
                 .catch(error => {
-                    res.status(404).json({error: error.message});
+                    res.status(405).json({error: error.message});
                 })
         })
         .catch(error => {
-            res.status(403).json({error: error.message});
+            res.status(404).json({error: error.message});
         })
 }
+
 
 exports.delete = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Path.deleteOne({_id: req.body.idPath})
-                .then(() => {
-                    res.status(200).json();
-                })
-                .catch(error => {
-                    res.status(404).json({error: error.message});
-                })
+            if (user.status === 0) {
+                res.status(403).json({error: "Student cannot delete Paths"});
+            } else {
+                Path.deleteOne({_id: req.params.idPath})
+                    .then(() => {
+                        res.status(200).json();
+                    })
+                    .catch(error => {
+                        res.status(404).json({error: error.message});
+                    })
+            }
         })
         .catch(error => {
-            res.status(403).json({error: error.message});
+            res.status(401).json({error: error.message});
         })
 }
 
