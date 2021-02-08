@@ -109,6 +109,8 @@ paths:
           description: le cours a été ajouté avec succès
         '401':
           description: Erreur d'authentification
+        '403':
+          description: Impossible d'ajouter le cours sélectionné
         '404':
           description: ressource non trouvée
           schema:
@@ -188,10 +190,12 @@ paths:
 
 
       responses:
-        '201':
+        '200':
           description: Le cours a été modifié avec succès
         '401':
           description: Erreur d'authentification
+        '403':
+          description: Impossible de modifier le cours sélectionné
         '404':
           description: ressource non trouvée
           schema:
@@ -240,10 +244,6 @@ paths:
           type: string
           in: path
           required: true
-        - name: pseudo
-          type: string
-          in: query
-          required: true
         - name: token
           type: string
           in: header
@@ -285,12 +285,16 @@ paths:
 
 
       responses:
-        '201':
+        '200':
           description: le parcours a été ajouté avec succès
         '401':
           description: Erreur d'authentification
+        '403':
+          description: accès interdit
         '404':
           description: ressource non trouvée
+        '500':
+          description: une erreur s'est produite pendant la connexion au serveur
           schema:
             type: object
             properties:
@@ -318,6 +322,8 @@ paths:
                   type: string
                 description:
                   type: string
+        '500':
+          description: une erreur s'est produite pendant la connexion au serveur
 
   /path/{idPath}/:
     put:
@@ -347,12 +353,16 @@ paths:
 
 
       responses:
-        '201':
+        '200':
           description: le parcours a été modifié avec succès
         '401':
           description: Erreur d'authentification
+        '403':
+          description: Impossible de modifier le parcours sélectionné
         '404':
           description: ressource non trouvée
+        '500':
+          description: une erreur s'est produite pendant la connexion au serveur
           schema:
             type: object
             properties:
@@ -373,8 +383,35 @@ paths:
       responses:
         '200':
           description: le parcours a été trouvé avec succès
+          schema:
+            type: object
+            properties:
+              idPath:
+                type: string
+              title:
+                type: string
+              description:
+                type: string
+              classes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idClasse:
+                      type: string
+                    title:
+                      type: string
+                      example: Express NodeJS
+                    description:
+                      type: string
+                      example: Un langage javascript pour réaliser des API REST
+                    idCreator:
+                      type: string
+
         '404':
           description: ressource non trouvée
+        '405':
+          description: Méthode Non Autorisée
           schema:
             type: object
             properties:
@@ -395,10 +432,6 @@ paths:
           type: string
           in: query
           required: true
-        - name: pseudo
-          type: string
-          in: query
-          required: true
         - name: token
           type: string
           description: Token d'autentification à mettre dans l'entête Authorisation
@@ -410,6 +443,8 @@ paths:
           description: le parcours a été supprimé avec succès
         '401':
           description: Erreur d'authentification
+        '403':
+          description: Impossible de supprimer le parcours sélectionné
         '404':
           description: ressource non trouvée
           schema:
