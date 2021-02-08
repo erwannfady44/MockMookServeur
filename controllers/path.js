@@ -38,8 +38,9 @@ exports.getAll = (req, res, next) => {
                             idPath: path._id,
                             title: path.title,
                             description: path.description,
-                            date: path.date,
+                            idUser: user._id,
                             pseudo: user.pseudo,
+                            date: path.date
                         });
                         i++;
                         if (i === paths.length)
@@ -61,8 +62,9 @@ exports.edit = (req, res, next) => {
             } else {
                 Path.findOne({_id: req.params.idPath})
                     .then((path) => {
-                        path.title = req.params.title;
-                        path.description = req.params.description;
+                        path.title = req.body.title;
+                        path.description = req.body.description;
+                        path.date = Date.now();
                         res.status(200).json();
                     })
                     .catch(error => {
@@ -94,6 +96,7 @@ exports.getOne = (req, res, next) => {
                                                 title: classe.title,
                                                 description: classe.description,
                                                 date: classe.date,
+                                                idUser: user._id,
                                                 pseudo: user.pseudo
                                             })
                                             i++;
@@ -102,6 +105,7 @@ exports.getOne = (req, res, next) => {
                                                     idPath: path._id,
                                                     title: path.title,
                                                     description: path.description,
+                                                    idUser: user_path._id,
                                                     pseudo: user_path.pseudo,
                                                     date: path.date,
                                                     classes: tab
@@ -113,6 +117,7 @@ exports.getOne = (req, res, next) => {
                                     idPath: path._id,
                                     title: path.title,
                                     description: path.description,
+                                    idUser: user_path._id,
                                     pseudo: user_path.pseudo,
                                     date: path.date
                                 })

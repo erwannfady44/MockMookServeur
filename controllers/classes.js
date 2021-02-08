@@ -14,22 +14,14 @@ exports.add = (req, res, next) => {
                     description: req.body.title
                 })
 
-                if (req.body.idPath) {
-                    Path.findOne({_id: req.body.idPath})
-                        .then((path) => {
-                            if (path) {
-                                classes.idPath = req.body.idPath;
-                                classes.save()
-                                    .then(() => res.status(201).json())
-                                    .catch((err) => res.status(500).json({error: err.message}))
-                            } else
-                                res.status(404);
-                        })
-                } else {
-                    classes.save()
-                        .then(() => res.status(201))
-                        .catch((err) => res.status(500).json({error: err.message}))
-                }
+                Path.findOne({_id: req.body.idPath})
+                    .then((path) => {
+                            classes.idPath = req.body.idPath;
+                            classes.save()
+                                .then(() => res.status(201))
+                                .catch((err) => res.status(500).json({error: err.message}))
+                    })
+                    .catch((err) => res.status(404).json({error: err.message}))
             }
         }).catch((err) => res.status(401).json({error: err.message}))
 }
@@ -67,9 +59,10 @@ exports.edit = (req, res, next) => {
             } else {
                 Classes.findOne({_id: req.params.idClasses})
                     .then((classe) => {
-                        classe.title = req.params.title;
-                        classe.description = req.params.description;
-                        classe.pseudo = req.params.pseudo;
+                        classe.title = req.body.title;
+                        classe.description = req.body.description;
+                        classe.pseudo = req.body.pseudo;
+                        classe.date = Date.now();
                         res.status(200).json();
                     })
                     .catch(error => {
@@ -85,13 +78,18 @@ exports.edit = (req, res, next) => {
 exports.getOne = (req, res, next) => {
     Classes.findOne({_id: req.params.idClasses})
         .then((classe) => {
-            res.status(200).json({
-                idClasses: classe.idClasses,
-                idPath: classe.idPath,
-                title: classe.title,
-                description: classe.description,
-                idCreator: classe.idCreator
-            });
+            User.findOne({_id: classe.idCreator})
+                .then(user => {
+                    res.status(200).json({
+                        idClasses: classe.idClasses,
+                        idPath: classe.idPath,
+                        title: classe.title,
+                        description: classe.description,
+                        idCreator: classe.idCreator,
+                        pseudo: user.pseudo,
+                        date: classe.date
+                    });
+                })
         })
         .catch(error => {
             res.status(404).json({error: error.message});
