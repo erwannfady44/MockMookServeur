@@ -20,7 +20,7 @@ exports.add = (req, res, next) => {
                             if (path) {
                                 classes.idPath = req.body.idPath;
                                 classes.save()
-                                    .then(() => res.status(201))
+                                    .then(() => res.status(201).json())
                                     .catch((err) => res.status(500).json({error: err.message}))
                             } else
                                 res.status(404);
