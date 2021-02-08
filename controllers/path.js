@@ -62,8 +62,8 @@ exports.edit = (req, res, next) => {
             } else {
                 Path.findOne({_id: req.params.idPath})
                     .then((path) => {
-                        path.title = req.params.title;
-                        path.description = req.params.description;
+                        path.title = req.body.title;
+                        path.description = req.body.description;
                         path.date = Date.now();
                         res.status(200).json();
                     })
