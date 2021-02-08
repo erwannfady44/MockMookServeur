@@ -3,9 +3,11 @@ const Classes = require('../Models/Classes');
 const Path = require('../Models/Path');
 
 exports.add = (req, res, next) => {
-    User.findOne({pseudo: req.body.pseudo})
+    User.findOne({_id: req.body.idUser})
         .then((user) => {
-            if (user) {
+            if (user.status === 0) {
+                res.status(403).json({error: "Student cannot delete Paths"});
+            } else {
                 let classes = new Classes({
                     idCreator: user._id,
                     title: req.body.title,
@@ -29,7 +31,7 @@ exports.add = (req, res, next) => {
                         .catch((err) => res.status(500).json({error: err.message}))
                 }
             }
-        }).catch((err) => res.status(500).json({error: err.message}))
+        }).catch((err) => res.status(401).json({error: err.message}))
 }
 
 exports.getAll = (req, res, next) => {
@@ -41,9 +43,9 @@ exports.getAll = (req, res, next) => {
             res.status(500).json({error: error.message});
         })
 }
-
+/*
 exports.getClasses = (req, res, next) => {
-    Path.findOne({_id: req.body.idPath})
+    Path.findOne({_id: req.params.idPath})
         .then((path) => {
             Classes.find({idPath: path.idPath})
                 .then((classes) => {
@@ -55,17 +57,65 @@ exports.getClasses = (req, res, next) => {
         })
         .catch((err) => res.status(404).json({error: err.message}))
 }
+*/
 
 exports.edit = (req, res, next) => {
-
+    User.findOne({_id: req.body.idUser})
+        .then((user) => {
+            if (user.status === 0) {
+                res.status(403).json({error: "Student cannot delete Paths"});
+            } else {
+                Classes.findOne({_id: req.params.idClasses})
+                    .then((classe) => {
+                        classe.title = req.params.title;
+                        classe.description = req.params.description;
+                        classe.pseudo = req.params.pseudo;
+                        res.status(200).json();
+                    })
+                    .catch(error => {
+                        res.status(404).json({error: error.message});
+                    })
+            }
+        })
+        .catch(error => {
+            res.status(401).json({error: error.message});
+        })
 }
 
 exports.getOne = (req, res, next) => {
-
+    Classes.findOne({_id: req.params.idClasses})
+        .then((classe) => {
+            res.status(200).json({
+                idClasses: classe.idClasses,
+                idPath: classe.idPath,
+                title: classe.title,
+                description: classe.description,
+                idCreator: classe.idCreator
+            });
+        })
+        .catch(error => {
+            res.status(404).json({error: error.message});
+        })
 }
 
 exports.delete = (req, res, next) => {
-
+    User.findOne({_id: req.body.idUser})
+        .then((user) => {
+            if (user.status === 0) {
+                res.status(403).json({error: "Student cannot delete classes"});
+            } else {
+                Classes.deleteOne({_id: req.params.idClasses})
+                    .then(() => {
+                        res.status(200).json();
+                    })
+                    .catch(error => {
+                        res.status(404).json({error: error.message});
+                    })
+            }
+        })
+        .catch(error => {
+            res.status(401).json({error: error.message});
+        })
 }
 
 exports.findByKeyWord = (req, res, next) => {

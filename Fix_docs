@@ -5,12 +5,24 @@ path.getAll:
     code 500 à rajouter
 
 path.edit:
-    code 500 à rajouter
+    code 200 et non 201
+    code 403, 500 à rajouter
 
 path.getOne
-    retourne id, titre, description et pseudo et non un parcour
-    code 403 et 405 à rajouter
+    retourne id, titre, description + titre/description/pseudo de tous les cours de ce parcours
+    code 405 à rajouter
 
 path.delete
     pas de pseudo en paramètre
     code 403 à rajouter
+
+
+classe.add
+    code 401, 403 à rajouter
+
+classes.edit
+    code 200 et non 201
+    code 403 à rajouter
+
+classes.delete
+    pas de pseudo en paramètre
