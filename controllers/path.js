@@ -78,30 +78,39 @@ exports.edit = (req, res, next) => {
 exports.getOne = (req, res, next) => {
     Path.findOne({_id: req.params.idPath})
         .then((path) => {
-            Classes.find({_id: req.params.idPath})
+            Classes.find({idPath: req.params.idPath})
                 .then((classes) => {
-                    let tab = [];
-                    // TODO : Optimiser
-                    let i = 0;
-                    classes.forEach(classe => {
-                        User.findOne({_id: classe.idCreator})
-                            .then((user) => {
-                                tab.push({
-                                    idClasses: classe.idClasses,
-                                    title: classe.title,
-                                    description: classe.description,
-                                    pseudo: user.pseudo
+                    if (classes.length !== 0) {
+                        let tab = [];
+                        // TODO : Optimiser
+                        let i = 0;
+                        classes.forEach(classe => {
+                            User.findOne({_id: classe.idCreator})
+                                .then((user) => {
+                                    tab.push({
+                                        idClasses: classe.idClasses,
+                                        title: classe.title,
+                                        description: classe.description,
+                                        pseudo: user.pseudo
+                                    })
+                                    i++;
+                                    if (i === classes.length - 1)
+                                        res.status(200).json({
+                                            idPath: path._id,
+                                            title: path.title,
+                                            description: path.description,
+                                            classes: tab
+                                        });
                                 })
-                                i++;
-                                if (i === classes.length - 1)
-                                    res.status(200).json({
-                                        idPath: path.idPath,
-                                        title: path.title,
-                                        description: path.description,
-                                        classes: tab
-                                    });
-                            })
-                    })
+                        })
+                    }
+                    else {
+                        res.status(200).json({
+                            idPath: path._id,
+                            title: path.title,
+                            description: path.description,
+                        })
+                    }
                 })
                 .catch(error => {
                     res.status(405).json({error: error.message});
