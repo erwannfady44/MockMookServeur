@@ -18,7 +18,7 @@ exports.add = (req, res, next) => {
                     .then((path) => {
                             classes.idPath = req.body.idPath;
                             classes.save()
-                                .then(() => res.status(201))
+                                .then(() => res.status(201).json())
                                 .catch((err) => res.status(500).json({error: err.message}))
                     })
                     .catch((err) => res.status(404).json({error: err.message}))
