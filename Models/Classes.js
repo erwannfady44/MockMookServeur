@@ -5,6 +5,7 @@ const classesSchema = mongoose.Schema({
     idCreator: {type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true},
     title: {type: String, require: true},
     description: {type: String, require: true},
+    date: {type: Date, require: true}
 });
 
 module.exports = mongoose.model('Classes', classesSchema);
