@@ -64,6 +64,7 @@ exports.edit = (req, res, next) => {
                     .then((path) => {
                         path.title = req.params.title;
                         path.description = req.params.description;
+                        path.date = Date.now();
                         res.status(200).json();
                     })
                     .catch(error => {

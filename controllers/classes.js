@@ -70,6 +70,7 @@ exports.edit = (req, res, next) => {
                         classe.title = req.params.title;
                         classe.description = req.params.description;
                         classe.pseudo = req.params.pseudo;
+                        classe.date = Date.now();
                         res.status(200).json();
                     })
                     .catch(error => {
