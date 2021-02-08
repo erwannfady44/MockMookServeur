@@ -38,8 +38,9 @@ exports.getAll = (req, res, next) => {
                             idPath: path._id,
                             title: path.title,
                             description: path.description,
-                            date: path.date,
+                            idUser: user._id,
                             pseudo: user.pseudo,
+                            date: path.date
                         });
                         i++;
                         if (i === paths.length)
@@ -94,6 +95,7 @@ exports.getOne = (req, res, next) => {
                                                 title: classe.title,
                                                 description: classe.description,
                                                 date: classe.date,
+                                                idUser: user._id,
                                                 pseudo: user.pseudo
                                             })
                                             i++;
@@ -102,6 +104,7 @@ exports.getOne = (req, res, next) => {
                                                     idPath: path._id,
                                                     title: path.title,
                                                     description: path.description,
+                                                    idUser: user_path._id,
                                                     pseudo: user_path.pseudo,
                                                     date: path.date,
                                                     classes: tab
@@ -113,6 +116,7 @@ exports.getOne = (req, res, next) => {
                                     idPath: path._id,
                                     title: path.title,
                                     description: path.description,
+                                    idUser: user_path._id,
                                     pseudo: user_path.pseudo,
                                     date: path.date
                                 })

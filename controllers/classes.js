@@ -85,13 +85,18 @@ exports.edit = (req, res, next) => {
 exports.getOne = (req, res, next) => {
     Classes.findOne({_id: req.params.idClasses})
         .then((classe) => {
-            res.status(200).json({
-                idClasses: classe.idClasses,
-                idPath: classe.idPath,
-                title: classe.title,
-                description: classe.description,
-                idCreator: classe.idCreator
-            });
+            User.findOne({_id: classe.idCreator})
+                .then(user => {
+                    res.status(200).json({
+                        idClasses: classe.idClasses,
+                        idPath: classe.idPath,
+                        title: classe.title,
+                        description: classe.description,
+                        idCreator: classe.idCreator,
+                        pseudo: user.pseudo,
+                        date: classe.date
+                    });
+                })
         })
         .catch(error => {
             res.status(404).json({error: error.message});
