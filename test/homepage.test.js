@@ -15,7 +15,7 @@ describe("signup", () => {
                 'Accept-Charset': 'utf-8',
                 'User-Agent': 'my-reddit-client'
             },
-            form : {
+            form: {
                 pseudo: pseudo,
                 password: password
             }
@@ -36,7 +36,7 @@ describe("signup", () => {
                 'Accept-Charset': 'utf-8',
                 'User-Agent': 'my-reddit-client'
             },
-            form : {
+            form: {
                 pseudo: pseudo,
                 password: password
             }

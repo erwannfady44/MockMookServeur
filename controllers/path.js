@@ -1,5 +1,5 @@
 const User = require('../Models/User');
-const Classes = require('../Models/Classes');
+const Module = require('../Models/module');
 const Path = require('../Models/Path');
 
 exports.add = (req, res, next) => {
@@ -77,25 +77,25 @@ exports.getOne = (req, res, next) => {
         .then((path) => {
             User.findOne({_id: path.idCreator})
                 .then((user_path) => {
-                    Classes.find({idPath: req.params.idPath})
-                        .then((classes) => {
-                            if (classes.length !== 0) {
+                    Module.find({idPath: req.params.idPath})
+                        .then((modules) => {
+                            if (modules.length !== 0) {
                                 let tab = [];
                                 // TODO : Optimiser
                                 let i = 0;
-                                classes.forEach(classe => {
-                                    User.findOne({_id: classe.idCreator})
+                                modules.forEach(module => {
+                                    User.findOne({_id: module.idCreator})
                                         .then((user) => {
                                             tab.push({
-                                                idClasses: classe._id,
-                                                title: classe.title,
-                                                description: classe.description,
-                                                date: classe.date,
+                                                idModule: module._id,
+                                                title: module.title,
+                                                description: module.description,
+                                                date: module.date,
                                                 idUser: user._id,
                                                 pseudo: user.pseudo
                                             })
                                             i++;
-                                            if (i === classes.length - 1)
+                                            if (i === modules.length - 1)
                                                 res.status(200).json({
                                                     idPath: path._id,
                                                     title: path.title,

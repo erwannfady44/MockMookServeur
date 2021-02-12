@@ -1,11 +1,11 @@
 const User = require('../Models/User');
-const Classes = require('../Models/Classes');
+const Module = require('../Models/module');
 const Path = require('../Models/Path');
 
 exports.add = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            let classes = new Classes({
+            let modules = new Module({
                 idCreator: user._id,
                 title: req.body.title,
                 description: req.body.title
@@ -13,8 +13,8 @@ exports.add = (req, res, next) => {
 
             Path.findOne({_id: req.body.idPath})
                 .then((path) => {
-                    classes.idPath = req.body.idPath;
-                    classes.save()
+                    modules.idPath = req.body.idPath;
+                    modules.save()
                         .then(() => res.status(201).json())
                         .catch((err) => res.status(500).json({error: err.message}))
                 })
@@ -22,11 +22,15 @@ exports.add = (req, res, next) => {
         }).catch((err) => res.status(401).json({error: err.message}))
 }
 
+exports.clone = (req, res, next) => {
+
+}
+
 // Utile ?
 exports.getAll = (req, res, next) => {
-    Classes.find({})
-        .then((classes) => {
-            res.status(200).json({classes: classes});
+    Module.find({})
+        .then((modules) => {
+            res.status(200).json({modules: modules});
         })
         .catch(error => {
             res.status(500).json({error: error.message});
@@ -36,7 +40,7 @@ exports.getAll = (req, res, next) => {
 exports.getClasses = (req, res, next) => {
     Path.findOne({_id: req.params.idPath})
         .then((path) => {
-            Classes.find({idPath: path.idPath})
+            Module.find({idPath: path.idPath})
                 .then((classes) => {
                     res.status(200).json({classes: classes});
                 })
@@ -51,15 +55,15 @@ exports.getClasses = (req, res, next) => {
 exports.edit = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Classes.findOne({_id: req.params.idClasses})
-                .then((classe) => {
-                    if (user._id === classe.idCreator) {
+            Module.findOne({_id: req.params._id})
+                .then((module) => {
+                    if (user._id === module.idCreator) {
                         res.status(403).json();
                     } else {
-                        classe.title = req.body.title;
-                        classe.description = req.body.description;
-                        classe.pseudo = req.body.pseudo;
-                        classe.date = Date.now();
+                        module.title = req.body.title;
+                        module.description = req.body.description;
+                        module.pseudo = req.body.pseudo;
+                        module.date = Date.now();
                         res.status(200).json();
                     }
                 })
@@ -73,18 +77,18 @@ exports.edit = (req, res, next) => {
 }
 
 exports.getOne = (req, res, next) => {
-    Classes.findOne({_id: req.params.idClasses})
-        .then((classe) => {
-            User.findOne({_id: classe.idCreator})
+    Module.findOne({_id: req.params._id})
+        .then((module) => {
+            User.findOne({_id: module.idCreator})
                 .then(user => {
                     res.status(200).json({
-                        idClasses: classe.idClasses,
-                        idPath: classe.idPath,
-                        title: classe.title,
-                        description: classe.description,
-                        idCreator: classe.idCreator,
+                        idModule: module._id,
+                        idPath: module.idPath,
+                        title: module.title,
+                        description: module.description,
+                        idCreator: module.idCreator,
                         pseudo: user.pseudo,
-                        date: classe.date
+                        date: module.date
                     });
                 })
         })
@@ -96,9 +100,9 @@ exports.getOne = (req, res, next) => {
 exports.delete = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Classes.deleteOne({_id: req.params.idClasses})
-                .then(classe => {
-                    if (user._id === classe.idCreator) {
+            Module.deleteOne({_id: req.params._id})
+                .then(module => {
+                    if (user._id === module.idCreator) {
                         res.status(403).json();
                     } else {
                         res.status(200).json();
