@@ -8,7 +8,7 @@ exports.add = (req, res, next) => {
             let module = new Module({
                 idCreator: user._id,
                 title: req.body.title,
-                description: req.body.title
+                description: req.body.description
             })
 
             Path.findOne({_id: req.body.idPath})
@@ -29,14 +29,22 @@ exports.clone = (req, res, next) => {
             Module.findOne({_id: req.params.idModule})
                 .then(module => {
                     let newModule = new Module({
+                        idPath: req.params.idPath,
                         idCreator: user._id,
-                        title: req.body.title,
-                        description: req.body.title
+                        title: module.title,
+                        description: module.description
                     })
+                    newModule.save()
+                        .then(() => res.status(201).json())
+                        .catch((err) => res.status(500).json({error: err.message}))
                 })
                 .catch((err) => res.status(404).json({error: err.message}))
         })
         .catch((err) => res.status(401).json({error: err.message}))
+}
+
+function cloneRessource(id) {
+
 }
 
 // Utile ?
