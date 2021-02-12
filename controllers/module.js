@@ -5,7 +5,7 @@ const Path = require('../Models/Path');
 exports.add = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            let modules = new Module({
+            let module = new Module({
                 idCreator: user._id,
                 title: req.body.title,
                 description: req.body.title
@@ -13,17 +13,30 @@ exports.add = (req, res, next) => {
 
             Path.findOne({_id: req.body.idPath})
                 .then((path) => {
-                    modules.idPath = req.body.idPath;
-                    modules.save()
+                    module.idPath = req.body.idPath;
+                    module.save()
                         .then(() => res.status(201).json())
                         .catch((err) => res.status(500).json({error: err.message}))
                 })
                 .catch((err) => res.status(404).json({error: err.message}))
-        }).catch((err) => res.status(401).json({error: err.message}))
+        })
+        .catch((err) => res.status(401).json({error: err.message}))
 }
 
 exports.clone = (req, res, next) => {
-
+    User.findOne({_id: req.body.idUser})
+        .then(user => {
+            Module.findOne({_id: req.params.idModule})
+                .then(module => {
+                    let newModule = new Module({
+                        idCreator: user._id,
+                        title: req.body.title,
+                        description: req.body.title
+                    })
+                })
+                .catch((err) => res.status(404).json({error: err.message}))
+        })
+        .catch((err) => res.status(401).json({error: err.message}))
 }
 
 // Utile ?
@@ -37,12 +50,12 @@ exports.getAll = (req, res, next) => {
         })
 }
 /*
-exports.getClasses = (req, res, next) => {
+exports.getModules = (req, res, next) => {
     Path.findOne({_id: req.params.idPath})
         .then((path) => {
             Module.find({idPath: path.idPath})
-                .then((classes) => {
-                    res.status(200).json({classes: classes});
+                .then((modules) => {
+                    res.status(200).json({modules: modules});
                 })
                 .catch(error => {
                     res.status(500).json({error: error.message});
@@ -55,7 +68,7 @@ exports.getClasses = (req, res, next) => {
 exports.edit = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Module.findOne({_id: req.params._id})
+            Module.findOne({_id: req.params.idModule})
                 .then((module) => {
                     if (user._id === module.idCreator) {
                         res.status(403).json();
@@ -77,7 +90,7 @@ exports.edit = (req, res, next) => {
 }
 
 exports.getOne = (req, res, next) => {
-    Module.findOne({_id: req.params._id})
+    Module.findOne({_id: req.params.idModule})
         .then((module) => {
             User.findOne({_id: module.idCreator})
                 .then(user => {
@@ -100,7 +113,7 @@ exports.getOne = (req, res, next) => {
 exports.delete = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Module.deleteOne({_id: req.params._id})
+            Module.deleteOne({_id: req.params.idModule})
                 .then(module => {
                     if (user._id === module.idCreator) {
                         res.status(403).json();

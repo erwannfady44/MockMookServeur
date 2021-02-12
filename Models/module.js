@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const classesSchema = mongoose.Schema({
+const moduleSchema = mongoose.Schema({
     idPath: {type: mongoose.Schema.Types.ObjectId, ref: 'Path', require: true},
     idCreator: {type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true},
     title: {type: String, require: true},
@@ -8,4 +8,4 @@ const classesSchema = mongoose.Schema({
     date: {type: Date, require: true}
 });
 
-module.exports = mongoose.model('Module', classesSchema);
+module.exports = mongoose.model('Module', modulesSchema);

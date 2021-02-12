@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const yaml = require('yamljs');
 const userRouter = require('./routes/user');
-const classesRouter = require('./routes/module');
+const moduleRouter = require('./routes/module');
 const pathRouter = require('./routes/path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = yaml.load('./swagger.yaml');
@@ -40,7 +40,7 @@ app.use(cors({origin: '*'}));
 //app.use(cors({origin: 'http://localhost:4200'}));
 
 app.use('/api/user', userRouter);
-app.use('/api/class', classesRouter);
+app.use('/api/class', moduleRouter);
 app.use('/api/path', pathRouter);
 app.use('/api-docs/', swaggerUi.serve);
 app.get('/api-docs/', swaggerUi.setup(swaggerDocument));

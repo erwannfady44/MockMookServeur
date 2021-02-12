@@ -103,7 +103,7 @@ exports.getOne = (req, res, next) => {
                                                     date: path.date,
                                                     idUser: user_path._id,
                                                     pseudo: user_path.pseudo,
-                                                    classes: tab
+                                                    modules: tab
                                                 });
                                         })
                                 })
