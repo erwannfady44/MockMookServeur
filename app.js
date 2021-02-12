@@ -40,7 +40,7 @@ app.use(cors({origin: '*'}));
 //app.use(cors({origin: 'http://localhost:4200'}));
 
 app.use('/api/user', userRouter);
-app.use('/api/class', moduleRouter);
+app.use('/api/module', moduleRouter);
 app.use('/api/path', pathRouter);
 app.use('/api-docs/', swaggerUi.serve);
 app.get('/api-docs/', swaggerUi.setup(swaggerDocument));
