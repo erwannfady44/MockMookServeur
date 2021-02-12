@@ -8,4 +8,4 @@ const moduleSchema = mongoose.Schema({
     date: {type: Date, require: true}
 });
 
-module.exports = mongoose.model('Module', modulesSchema);
+module.exports = mongoose.model('Module', moduleSchema);
