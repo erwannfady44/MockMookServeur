@@ -95,7 +95,7 @@ exports.getOne = (req, res, next) => {
                                                 pseudo: user.pseudo
                                             })
                                             i++;
-                                            if (i === modules.length - 1)
+                                            if (i === modules.length)
                                                 res.status(200).json({
                                                     idPath: path._id,
                                                     title: path.title,
