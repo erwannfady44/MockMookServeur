@@ -17,6 +17,7 @@ router.get('/:idPath/:idModule', auth, pathController.getOneModule);
 router.put('/:idModule/resource', auth, pathController.addResource);
 router.post('/:idResource', auth, pathController.editResource);
 
+router.get('/:idPath/:idModule', pathController.getOneModule);
 router.get('/findByKeyWord', pathController.findByKeyWord);
 
 module.exports = router;
