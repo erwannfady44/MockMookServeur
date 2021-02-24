@@ -261,6 +261,10 @@ exports.addRessource = (req, res, next) => {
         .catch((err) => res.status(401).json({error: err.message}))
 }
 
+exports.editRessource = (req, res, next) => {
+
+}
+
 exports.findByKeyWord = (req, res, next) => {
 
 }

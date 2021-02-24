@@ -7,7 +7,8 @@ const resourceSchema = mongoose.Schema({
     url: {type: String, require: true, unique: true},
     title: {type: String, require: true},
     description: {type: String, require: true},
-    date: {type: Date, require: true}
+    date: {type: Date, require: true},
+    position: {type: Number, require: true}
 });
 
 resourceSchema.plugin(uniqueValidator);

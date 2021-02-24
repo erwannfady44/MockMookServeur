@@ -5,7 +5,8 @@ const moduleSchema = mongoose.Schema({
     idCreator: {type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true},
     title: {type: String, require: true},
     description: {type: String, require: true},
-    date: {type: Date, require: true}
+    date: {type: Date, require: true},
+    position: {type: Number, require: true}
 });
 
 module.exports = mongoose.model('Module', moduleSchema);
