@@ -55,7 +55,7 @@ exports.edit = (req, res, next) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then((path) => {
-                    if (user._id === path.idCreator) {
+                    if (user._id !== path.idCreator) {
                         res.status(403).json();
                     } else {
                         path.title = req.body.title;
@@ -177,13 +177,12 @@ exports.editModule = (req, res, next) => {
         .then((user) => {
             Module.findOne({_id: req.params.idModule})
                 .then((module) => {
-                    if (user._id === module.idCreator) {
+                    if (user._id !== module.idCreator) {
                         res.status(403).json();
 
                     } else {
                         module.title = req.body.title;
                         module.description = req.body.description;
-                        module.pseudo = req.body.pseudo;
                         module.date = Date.now();
                         res.status(200).json();
                     }
@@ -265,6 +264,18 @@ exports.editResource = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
             Resource.findOne({_id: req.params.idResource})
+                .then(resource => {
+                    if (user._id !== resource.idCreator){
+                        res.status(403).json()
+                    } else {
+                        resource.url = req.body.url;
+                        resource.title = req.body.title;
+                        resource.description = req.body.description;
+                        resource.date = Date.now();
+                        res.status(200).json();
+                    }
+                })
+                .catch((err) => res.status(404).json({error: err.message}))
         })
         .catch((err) => res.status(401).json({error: err.message}))
 }

@@ -11,13 +11,12 @@ router.delete('/:idPath', auth, pathController.delete);
 
 router.put('/:idPath/module', auth, pathController.addModule);
 router.post('/:idPath/:idModule', auth, pathController.editModule);
+router.get('/:idPath/:idModule', pathController.getOneModule);
 router.delete('/:idPath/:idModule', auth, pathController.deleteModule);
-router.get('/:idPath/:idModule', auth, pathController.getOneModule);
 
 router.put('/:idModule/resource', auth, pathController.addResource);
 router.post('/:idResource', auth, pathController.editResource);
 
-router.get('/:idPath/:idModule', pathController.getOneModule);
 router.get('/findByKeyWord', pathController.findByKeyWord);
 
 module.exports = router;
