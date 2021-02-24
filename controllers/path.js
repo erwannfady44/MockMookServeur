@@ -57,7 +57,9 @@ exports.edit = (req, res, next) => {
                         path.title = req.body.title;
                         path.description = req.body.description;
                         path.date = Date.now();
-                        res.status(200).json();
+                        path.save()
+                            .then(() => res.status(201).json())
+                            .catch((err) => res.status(500).json({error: err.message}))
                     }
                 })
                 .catch((error) => res.status(404).json({error: error.message}));
@@ -153,12 +155,12 @@ exports.addModule = (req, res, next) => {
             Path.findOne({_id: req.params.idPath})
                 .then((path) => {
                     module.idPath = path._id;
+                    path.date = Date.now();
                     module.save()
-                        .then(() => {
-                            path.date = Date.now();
-                            res.status(201).json();
-                        })
-                        .catch((err) => res.status(500).json({error: err.message}))
+                        .then(() => path.save()
+                            .then(() => res.status(201).json())
+                            .catch((err) => res.status(500).json({error: err.message})))
+                        .catch((err) => res.status(501).json({error: err.message}))
                 })
                 .catch((err) => res.status(404).json({error: err.message}))
         })
@@ -174,13 +176,16 @@ exports.editModule = (req, res, next) => {
                         .then((module) => {
                             if (user._id !== module.idCreator) {
                                 res.status(403).json();
-
                             } else {
                                 module.title = req.body.title;
                                 module.description = req.body.description;
                                 module.date = Date.now();
                                 path.date = Date.now();
-                                res.status(200).json();
+                                module.save()
+                                    .then(() => path.save()
+                                        .then(() => res.status(200).json())
+                                        .catch((err) => res.status(500).json({error: err.message})))
+                                    .catch((err) => res.status(501).json({error: err.message}))
                             }
                         })
                         .catch((error) => res.status(405).json({error: error.message}));
@@ -203,7 +208,9 @@ exports.deleteModule = (req, res, next) => {
                                 Module.deleteOne({_id: module._id})
                                     .then(() => {
                                         path.date = Date.now();
-                                        res.status(200).json();
+                                        path.save()
+                                            .then(() => res.status(200).json())
+                                            .catch((err) => res.status(500).json({error: err.message}))
                                     })
                                     .catch((err) => res.status(405).json({error: err.message}))
                             }
@@ -284,13 +291,15 @@ exports.addResource = (req, res, next) => {
                     Path.findOne({_id: module.idPath})
                         .then(path => {
                             resource.idModule = module._id;
+                            module.date = Date.now();
+                            path.date = Date.now();
                             resource.save()
-                                .then(() => {
-                                    module.date = Date.now();
-                                    path.date = Date.now();
-                                    res.status(201).json();
-                                })
-                                .catch((err) => res.status(500).json({error: err.message}))
+                                .then(() => module.save()
+                                    .then(() => path.save()
+                                        .then(() => res.status(201).json())
+                                        .catch((err) => res.status(500).json({error: err.message})))
+                                    .catch((err) => res.status(501).json({error: err.message})))
+                                .catch((err) => res.status(502).json({error: err.message}))
                         })
                         .catch((error) => res.status(404).json({error: error.message}));
                 })
@@ -317,7 +326,13 @@ exports.editResource = (req, res, next) => {
                                         resource.date = Date.now();
                                         module.date = Date.now();
                                         path.date = Date.now();
-                                        res.status(200).json();
+                                        resource.save()
+                                            .then(() => module.save()
+                                                .then(() => path.save()
+                                                    .then(() => res.status(200).json())
+                                                    .catch((err) => res.status(500).json({error: err.message})))
+                                                .catch((err) => res.status(501).json({error: err.message})))
+                                            .catch((err) => res.status(502).json({error: err.message}))
                                     }
                                 })
                                 .catch((err) => res.status(406).json({error: err.message}))
@@ -361,7 +376,11 @@ exports.deleteResource = (req, res, next) => {
                                             .then(() => {
                                                 module.date = Date.now();
                                                 path.date = Date.now();
-                                                res.status(200).json();
+                                                module.save()
+                                                    .then(() => path.save()
+                                                        .then(() => res.status(200).json())
+                                                        .catch((err) => res.status(500).json({error: err.message})))
+                                                    .catch((err) => res.status(501).json({error: err.message}))
                                             })
                                             .catch((err) => res.status(406).json({error: err.message}))
                                     }
