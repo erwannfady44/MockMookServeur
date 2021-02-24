@@ -127,8 +127,8 @@ exports.delete = (req, res, next) => {
                     if (user._id !== path.idCreator) {
                         res.status(403).json();
                     } else {
-                        Path.deleteOne({_id: path.idPath})
-                            .then(path => {
+                        Path.deleteOne({_id: path._id})
+                            .then(() => {
                                 res.status(200).json();
                             })
                             .catch((err) => res.status(404).json({error: err.message}))
@@ -184,12 +184,16 @@ exports.editModule = (req, res, next) => {
 exports.deleteModule = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Module.deleteOne({_id: req.params.idModule})
+            Module.findOne({_id: req.params.idModule})
                 .then(module => {
-                    if (user._id === module.idCreator) {
+                    if (user._id !== module.idCreator) {
                         res.status(403).json();
                     } else {
-                        res.status(200).json();
+                        Module.deleteOne({_id: module._id})
+                            .then(() => {
+                                res.status(403).json();
+                            })
+                            .catch((err) => res.status(404).json({error: err.message}))
                     }
                 })
                 .catch((error) => res.status(404).json({error: error.message}));
@@ -281,7 +285,15 @@ exports.deleteResource = (req, res, next) => {
         .then(user => {
             Resource.findOne({_id: req.params.idResource})
                 .then(resource => {
-
+                    if (user._id !== resource.idCreator) {
+                        res.status(403).json();
+                    } else {
+                        Resource.deleteOne({_id: resource._id})
+                            .then(() => {
+                                res.status(200).json();
+                            })
+                            .catch((err) => res.status(404).json({error: err.message}))
+                    }
                 })
                 .catch((err) => res.status(404).json({error: err.message}))
         })
