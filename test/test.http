@@ -1,5 +1,4 @@
-POST /localhost:3000/api/
-form
+GET /localhost:3000/api/path/603677943dff8f033019c158/603679cb3dff8f033019c15c/
 
-###
-GET /api/user/signup
+
+
