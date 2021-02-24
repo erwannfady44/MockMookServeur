@@ -395,5 +395,20 @@ exports.deleteResource = (req, res, next) => {
 }
 
 exports.findByKeyWord = (req, res, next) => {
-
+    let keywords = req.body.tab;
+    let results = [];
+    for (let i = 0; i < keywords.length; i++) {
+        Path.find({titre: keywords[i]})
+            .then(paths => {
+                paths.forEach(path => {
+                    if ((new RegExp("\\b" + keywords[i] + "\\b", "i").test(path.title))) {
+                        results.push(keywords[i]);
+                        if (results.length >= 20){
+                            res.status(200).json({tab: results});
+                        }
+                    }
+                })
+            })
+    }
+    res.status(200).json({tab: results});
 }
