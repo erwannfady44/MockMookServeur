@@ -16,6 +16,7 @@ router.delete('/:idPath/:idModule', auth, pathController.deleteModule);
 
 router.put('/:idModule/resource', auth, pathController.addResource);
 router.post('/:idResource', auth, pathController.editResource);
+router.get('/:idResource', pathController.getOneResource);
 
 router.get('/findByKeyWord', pathController.findByKeyWord);
 

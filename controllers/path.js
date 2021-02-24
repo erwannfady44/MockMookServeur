@@ -34,7 +34,7 @@ exports.getAll = (req, res, next) => {
                             idPath: path._id,
                             title: path.title,
                             description: path.description,
-                            idUser: user._id,
+                            idCreator: user._id,
                             pseudo: user.pseudo,
                             date: path.date
                         });
@@ -91,9 +91,10 @@ exports.getOne = (req, res, next) => {
                                                 idModule: module._id,
                                                 title: module.title,
                                                 description: module.description,
+                                                idCreator: user._id,
+                                                pseudo: user.pseudo,
                                                 date: module.date,
-                                                idUser: user._id,
-                                                pseudo: user.pseudo
+                                                position: module.position
                                             })
                                             i++;
                                             if (i === modules.length)
@@ -101,9 +102,9 @@ exports.getOne = (req, res, next) => {
                                                     idPath: path._id,
                                                     title: path.title,
                                                     description: path.description,
-                                                    date: path.date,
-                                                    idUser: user_path._id,
+                                                    idCreator: user_path._id,
                                                     pseudo: user_path.pseudo,
+                                                    date: path.date,
                                                     modules: tab
                                                 });
                                         })
@@ -113,9 +114,9 @@ exports.getOne = (req, res, next) => {
                                     idPath: path._id,
                                     title: path.title,
                                     description: path.description,
-                                    date: path.date,
-                                    idUser: user_path._id,
-                                    pseudo: user_path.pseudo
+                                    idCreator: user_path._id,
+                                    pseudo: user_path.pseudo,
+                                    date: path.date
                                 })
                             }
                         })
@@ -228,7 +229,8 @@ exports.getOneModule = (req, res, next) => {
                         description: module.description,
                         idCreator: module.idCreator,
                         pseudo: user.pseudo,
-                        date: module.date
+                        date: module.date,
+                        position: module.position
                     });
                 })
         })
@@ -278,6 +280,22 @@ exports.editResource = (req, res, next) => {
                 .catch((err) => res.status(404).json({error: err.message}))
         })
         .catch((err) => res.status(401).json({error: err.message}))
+}
+
+exports.getOneResource = (req, res, next) => {
+    Resource.findOne({_id: req.params.idResource})
+        .then(resource => {
+            res.status(200).json({
+                idResource: resource._id,
+                idModule: resource.idModule,
+                url: resource.url,
+                title: resource.title,
+                description: resource.description,
+                date: resource.date,
+                position: resource.position
+            });
+        })
+        .catch((err) => res.status(404).json({error: err.message}))
 }
 
 exports.findByKeyWord = (req, res, next) => {
