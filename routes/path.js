@@ -8,6 +8,10 @@ router.get('/', pathController.getAll);
 router.put('/:idPath', auth, pathController.edit);
 router.get('/:idPath', pathController.getOne);
 router.delete('/:idPath', auth, pathController.delete);
+router.put('/:idPath/module', auth, pathController.addModule);
+router.post('/:idPath/module', auth, pathController.editModule);
+router.delete('/:idPath/module', auth, pathController.deleteModule);
+router.get('/:idPath/module', auth, pathController.getOneModule);
 router.get('/findByKeyWord', pathController.findByKeyWord);
 
 module.exports = router;
