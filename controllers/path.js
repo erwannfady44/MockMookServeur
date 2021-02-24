@@ -89,7 +89,7 @@ exports.getOne = (req, res, next) => {
                                                 position: module.position
                                             })
                                             i++;
-                                            if (i === modules.length)
+                                            if (i === modules.length) {
                                                 res.status(200).json({
                                                     idPath: path._id,
                                                     title: path.title,
@@ -99,6 +99,7 @@ exports.getOne = (req, res, next) => {
                                                     date: path.date,
                                                     modules: tab
                                                 });
+                                            }
                                         })
                                 })
                             } else {
@@ -206,16 +207,50 @@ exports.getOneModule = (req, res, next) => {
         .then((module) => {
             User.findOne({_id: module.idCreator})
                 .then(user => {
-                    res.status(200).json({
-                        idModule: module._id,
-                        idPath: module.idPath,
-                        title: module.title,
-                        description: module.description,
-                        idCreator: module.idCreator,
-                        pseudo: user.pseudo,
-                        date: module.date,
-                        position: module.position
-                    });
+                    Resource.find({_id: req.params.idModule})
+                        .then(resources => {
+                            if (resources.length !== 0) {
+                                let tab = [];
+                                let i = 0;
+                                resources.forEach(resource => {
+                                    tab.push({
+                                        idResource: resource._id,
+                                        idModule: resource.idModule,
+                                        url: resource.url,
+                                        title: resource.title,
+                                        description: resource.description,
+                                        date: resource.date,
+                                        position: resource.position
+                                    })
+                                    i++;
+                                    if (i === resources.length) {
+                                        res.status(200).json({
+                                            idModule: module._id,
+                                            idPath: module.idPath,
+                                            title: module.title,
+                                            description: module.description,
+                                            idCreator: module.idCreator,
+                                            pseudo: user.pseudo,
+                                            date: module.date,
+                                            position: module.position,
+                                            resources: tab
+                                        });
+                                    }
+                                })
+                            } else {
+                                res.status(200).json({
+                                    idModule: module._id,
+                                    idPath: module.idPath,
+                                    title: module.title,
+                                    description: module.description,
+                                    idCreator: module.idCreator,
+                                    pseudo: user.pseudo,
+                                    date: module.date,
+                                    position: module.position
+                                });
+                            }
+                        })
+                        .catch((error) => res.status(405).json({error: error.message}));
                 })
         })
         .catch((error) => res.status(404).json({error: error.message}));
