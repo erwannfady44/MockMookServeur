@@ -38,5 +38,16 @@ exports.getAll = (req, res, next) => {
 }
 
 exports.findByKeyWord = (req, res, next) => {
-
+    const keyWords = req.query.keyWords.split(', ')
+    const reg = [];
+    keyWords.forEach(word => {
+        reg.push(new RegExp(word, "i"))
+    })
+    Module.find({
+        $or: [
+            {"title": {$all: reg}},
+            {"description": {$all: reg}}
+        ]
+    }).then(modules => res.status(200).json(modules))
+        .catch(error => res.status(404).json({error: error.message}))
 }

@@ -1,4 +1,12 @@
-GET /localhost:3000/api/path/603677943dff8f033019c158/603679cb3dff8f033019c15c/
+POST http://localhost:3000/api/user/signup
+Content-Type: application/json
+
+{
+"pseudo":"aa",
+  "password": "aaa"
+}
+
+
 
 
 
