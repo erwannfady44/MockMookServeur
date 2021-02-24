@@ -3,7 +3,6 @@ const router = express.Router();
 const moduleController = require('../controllers/module');
 const auth = require('../controllers/auth');
 
-router.put('/', auth, moduleController.add);
 router.put('/:idModule', auth, moduleController.clone);
 router.get('/', moduleController.getAll);
 //router.get('/:idPath', moduleController.getModules);
