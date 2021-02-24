@@ -155,7 +155,8 @@ exports.addModule = (req, res, next) => {
             let module = new Module({
                 idCreator: user._id,
                 title: req.body.title,
-                description: req.body.description
+                description: req.body.description,
+                date: Date.now()
             })
 
             Path.findOne({_id: req.params.idPath})
