@@ -22,7 +22,7 @@ exports.clone = (req, res, next) => {
         .catch((err) => res.status(401).json({error: err.message}))
 }
 
-function cloneRessource(id) {
+function cloneResource(id) {
 
 }
 

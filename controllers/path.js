@@ -1,5 +1,5 @@
 const User = require('../Models/User');
-const Ressource = require('../Models/Resource');
+const Resource = require('../Models/Resource');
 const Module = require('../Models/module');
 const Path = require('../Models/Path');
 
@@ -238,10 +238,10 @@ exports.getOneModule = (req, res, next) => {
         })
 }
 
-exports.addRessource = (req, res, next) => {
+exports.addResource = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
-            let ressource = new Ressource({
+            let resource = new Resource({
                 idCreator: user._id,
                 url: req.body.url,
                 title: req.body.title,
@@ -251,8 +251,8 @@ exports.addRessource = (req, res, next) => {
 
             Module.findOne({_id: req.params.idModule})
                 .then(module => {
-                    ressource.idModule = module._id;
-                    ressource.save()
+                    resource.idModule = module._id;
+                    resource.save()
                         .then(() => res.status(201).json())
                         .catch((err) => res.status(500).json({error: err.message}))
                 })
@@ -261,8 +261,12 @@ exports.addRessource = (req, res, next) => {
         .catch((err) => res.status(401).json({error: err.message}))
 }
 
-exports.editRessource = (req, res, next) => {
-
+exports.editResource = (req, res, next) => {
+    User.findOne({_id: req.body.idUser})
+        .then(user => {
+            Resource.findOne({_id: req.params.idResource})
+        })
+        .catch((err) => res.status(401).json({error: err.message}))
 }
 
 exports.findByKeyWord = (req, res, next) => {
