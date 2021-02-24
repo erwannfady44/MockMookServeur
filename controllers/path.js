@@ -16,9 +16,7 @@ exports.add = (req, res, next) => {
                 .then(() => res.status(201).json())
                 .catch((error) => res.status(500).json({error: error.message}))
         })
-        .catch((error) => {
-            res.status(401).json({error: error.message})
-        })
+        .catch((error) => res.status(401).json({error: error.message}));
 }
 
 exports.getAll = (req, res, next) => {
@@ -45,9 +43,7 @@ exports.getAll = (req, res, next) => {
             })
 
         })
-        .catch(error => {
-            res.status(401).json({error: error.message});
-        })
+        .catch((error) => res.status(401).json({error: error.message}));
 }
 
 exports.edit = (req, res, next) => {
@@ -64,13 +60,9 @@ exports.edit = (req, res, next) => {
                         res.status(200).json();
                     }
                 })
-                .catch(error => {
-                    res.status(404).json({error: error.message});
-                })
+                .catch((error) => res.status(404).json({error: error.message}));
         })
-        .catch(error => {
-            res.status(401).json({error: error.message});
-        })
+        .catch((error) => res.status(401).json({error: error.message}));
 }
 
 exports.getOne = (req, res, next) => {
@@ -120,35 +112,31 @@ exports.getOne = (req, res, next) => {
                                 })
                             }
                         })
-                        .catch(error => {
-                            res.status(405).json({error: error.message});
-                        })
+                        .catch((error) => res.status(405).json({error: error.message}));
                 })
         })
-        .catch(error => {
-            res.status(404).json({error: error.message});
-        })
+        .catch((error) => res.status(404).json({error: error.message}));
 }
 
 
 exports.delete = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Path.deleteOne({_id: req.params.idPath})
+            Path.findOne({_id: req.params.idPath})
                 .then(path => {
-                    if (user._id === path.idCreator) {
+                    if (user._id !== path.idCreator) {
                         res.status(403).json();
                     } else {
-                        res.status(200).json();
+                        Path.deleteOne({_id: path.idPath})
+                            .then(path => {
+                                res.status(200).json();
+                            })
+                            .catch((err) => res.status(404).json({error: err.message}))
                     }
                 })
-                .catch(error => {
-                    res.status(404).json({error: error.message});
-                })
+                .catch(error => res.status(404).json({error: error.message}));
         })
-        .catch(error => {
-            res.status(401).json({error: error.message});
-        })
+        .catch(error => res.status(401).json({error: error.message}));
 }
 
 exports.addModule = (req, res, next) => {
@@ -188,13 +176,9 @@ exports.editModule = (req, res, next) => {
                         res.status(200).json();
                     }
                 })
-                .catch(error => {
-                    res.status(404).json({error: error.message});
-                })
+                .catch((error) => res.status(404).json({error: error.message}));
         })
-        .catch(error => {
-            res.status(401).json({error: error.message});
-        })
+        .catch((error) => res.status(401).json({error: error.message}));
 }
 
 exports.deleteModule = (req, res, next) => {
@@ -208,13 +192,9 @@ exports.deleteModule = (req, res, next) => {
                         res.status(200).json();
                     }
                 })
-                .catch(error => {
-                    res.status(404).json({error: error.message});
-                })
+                .catch((error) => res.status(404).json({error: error.message}));
         })
-        .catch(error => {
-            res.status(401).json({error: error.message});
-        })
+        .catch((error) => res.status(401).json({error: error.message}));
 }
 
 exports.getOneModule = (req, res, next) => {
@@ -234,9 +214,7 @@ exports.getOneModule = (req, res, next) => {
                     });
                 })
         })
-        .catch(error => {
-            res.status(404).json({error: error.message});
-        })
+        .catch((error) => res.status(404).json({error: error.message}));
 }
 
 exports.addResource = (req, res, next) => {
@@ -267,7 +245,7 @@ exports.editResource = (req, res, next) => {
         .then(user => {
             Resource.findOne({_id: req.params.idResource})
                 .then(resource => {
-                    if (user._id !== resource.idCreator){
+                    if (user._id !== resource.idCreator) {
                         res.status(403).json()
                     } else {
                         resource.url = req.body.url;
@@ -296,6 +274,18 @@ exports.getOneResource = (req, res, next) => {
             });
         })
         .catch((err) => res.status(404).json({error: err.message}))
+}
+
+exports.deleteResource = (req, res, next) => {
+    User.findOne({_id: req.body.idUser})
+        .then(user => {
+            Resource.findOne({_id: req.params.idResource})
+                .then(resource => {
+
+                })
+                .catch((err) => res.status(404).json({error: err.message}))
+        })
+        .catch((err) => res.status(401).json({error: err.message}))
 }
 
 exports.findByKeyWord = (req, res, next) => {
