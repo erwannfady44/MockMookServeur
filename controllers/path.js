@@ -163,7 +163,7 @@ exports.addModule = (req, res) => {
                                         title: req.body.title,
                                         description: req.body.description,
                                         date: Date.now(),
-                                        position: position++
+                                        position: position + 1
                                     })
                                     path.date = Date.now();
                                     module.save()
@@ -325,7 +325,7 @@ exports.addResource = (req, res) => {
                                                 title: req.body.title,
                                                 description: req.body.description,
                                                 date: Date.now(),
-                                                position: position++
+                                                position: position + 1
                                             })
                                             module.date = Date.now();
                                             path.date = Date.now();
@@ -500,7 +500,7 @@ exports.cloneModule = async (req, res) => {
                                                             title: module.title,
                                                             description: module.description,
                                                             date: new Date(),
-                                                            position: position++,
+                                                            position: position + 1,
                                                         }).save().catch((err) => res.status(500).json({error: err.message}))
                                                         //récupération de l'id du module
                                                         Module.findOne({idPath: req.params.idPath, position: position})
@@ -519,7 +519,7 @@ exports.cloneModule = async (req, res) => {
                                                                                             title: resource.title,
                                                                                             description: resource.description,
                                                                                             date: new Date(),
-                                                                                            position: position++
+                                                                                            position: position + 1
                                                                                         }).save().catch((err) => res.status(500).json({error: err.message}))
 
                                                                                     })
