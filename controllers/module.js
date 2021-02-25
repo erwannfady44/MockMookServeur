@@ -66,5 +66,5 @@ exports.findByKeyWord = (req, res, next) => {
             json
         })
     })
-        .catch(error => res.status(404).json({error: error.message}))
+        .catch(error => res.status(500).json({error: error.message}))
 }
