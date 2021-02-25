@@ -13,6 +13,7 @@ router.put('/:idPath/module', auth, pathController.addModule);
 router.post('/:idPath/:idModule', auth, pathController.editModule);
 router.get('/:idPath/:idModule', pathController.getOneModule);
 router.delete('/:idPath/:idModule', auth, pathController.deleteModule);
+router.post('/:idPath/:idModule/clone', auth, pathController.cloneModule);
 
 router.put('/:idModule/resource', auth, pathController.addResource);
 router.post('/:idModule/:idResource', auth, pathController.editResource);

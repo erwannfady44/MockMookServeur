@@ -49,6 +49,22 @@ exports.findByKeyWord = (req, res, next) => {
             {"description": {$all: reg}}
         ],
         $nor: [{idPath: req.query.idPath}]
-    }).then(modules => res.status(200).json(modules))
+    }).then(modules => {
+        const json = []
+        modules.forEach(module => {
+            json.push({
+                idModule: module._id,
+                title: module.title,
+                description: module.description,
+                idPath: module.idPath,
+                position: module.position,
+                idCreator: module.idCreator,
+                date: module.date,
+            });
+        })
+        res.status(200).json({
+            json
+        })
+    })
         .catch(error => res.status(404).json({error: error.message}))
 }
