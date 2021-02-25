@@ -146,20 +146,19 @@ exports.addModule = (req, res, next) => {
         .then((user) => {
             Module.find({idPath: req.params.idPath}).count()
                 .then(position => {
-                    let module = new Module({
-                        idCreator: user._id,
-                        title: req.body.title,
-                        description: req.body.description,
-                        date: Date.now(),
-                        position: position
-                    })
-
                     Path.findOne({_id: req.params.idPath})
                         .then((path) => {
                             if (!user._id.equals(path.idCreator)) {
                                 res.status(403).json();
                             } else {
-                                module.idPath = path._id;
+                                let module = new Module({
+                                    idPath: path._id,
+                                    idCreator: user._id,
+                                    title: req.body.title,
+                                    description: req.body.description,
+                                    date: Date.now(),
+                                    position: position
+                                })
                                 path.date = Date.now();
                                 module.save()
                                     .then(() => path.save()
@@ -320,34 +319,6 @@ exports.addResource = (req, res, next) => {
                         })
                         .catch((err) => res.status(405).json({error: err.message}))
                 })
-            Module.findOne({_id: req.params.idModule})
-                .then(module => {
-                    if (user._id !== module.idCreator) {
-                        res.status(403).json();
-                    } else {
-                        Path.findOne({_id: module.idPath})
-                            .then(path => {
-                                let resource = new Resource({
-                                    idModule: module._id,
-                                    idCreator: user._id,
-                                    url: req.body.url,
-                                    title: req.body.title,
-                                    description: req.body.description,
-                                    date: Date.now()
-                                })
-                                path.date = Date.now();
-                                resource.save()
-                                    .then(() => module.save()
-                                        .then(() => path.save()
-                                            .then(() => res.status(201).json())
-                                            .catch((err) => res.status(500).json({error: err.message})))
-                                        .catch((err) => res.status(501).json({error: err.message})))
-                                    .catch((err) => res.status(502).json({error: err.message}))
-                            })
-                            .catch((error) => res.status(404).json({error: error.message}));
-                    }
-                })
-                .catch((err) => res.status(405).json({error: err.message}))
         })
         .catch((err) => res.status(401).json({error: err.message}))
 }
@@ -502,6 +473,7 @@ exports.cloneModule = async (req, res, next) => {
                                                                         })
                                                                     })
                                                             }
+
                                                             await cloneResources();
                                                             Path.findOne({_id: module.idPath})
                                                                 .then(path => {
