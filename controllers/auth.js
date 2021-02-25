@@ -8,10 +8,14 @@ module.exports = (req, res, next) => {
         const decodedToken = jwt.verify(token, keyToken);
         const idUser = decodedToken.idUser;
 
-        if (req.body.idUser && req.body.idUser !== idUser)
-            throw 'Wrong pseudo';
-        else
+        if (req.body.idUser && req.body.idUser === idUser)
             next();
+        else if (req.query.idUser && req.query.idUser === idUser)
+            next();
+        else
+            throw 'Wrong pseudo';
+
+
     } catch (error) {
         res.status(401).json({error: error | 'Not authenticated '});
     }
