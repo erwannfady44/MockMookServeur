@@ -73,7 +73,7 @@ paths:
           description: mot de passe incorrecte
         '404':
           description: pseudo incorrecte
-  /Module:
+  /path/{idPath}/Module:
     put:
       tags:
         - Module
@@ -116,10 +116,16 @@ paths:
           schema:
             type: object
             properties:
-              not-found:
+              error:
                 type: string
-                description: nom de la ressources non trouvée
-                example: path
+                example: path not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
     get:
       tags:
         - Module
@@ -153,6 +159,35 @@ paths:
                       example: L'architecture MEAN
                     idPath:
                       type: string
+  /Module/findByKeyWord:
+    get:
+      tags:
+        - Module
+      parameters:
+        - name: keyWord
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Retourne la liste des cours contenant le mot recherché
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: NodeJS
+                description:
+                  type: string
+                  example: NodeJS, un framework JavaScrip
+                creator:
+                  type: string
+                path:
+                  type: string
+        404:
+          description: Aucun cours trouvé
   /Module/{idModule}:
     put:
       tags:
@@ -196,15 +231,21 @@ paths:
           description: Erreur d'authentification
         '403':
           description: Impossible de modifier le cours sélectionné
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: you are not the owner
         '404':
           description: ressource non trouvée
           schema:
             type: object
             properties:
-              not-found:
+              error:
                 type: string
                 description: nom de la ressources non trouvée
-                example: path
+                example: path not found
     get:
       tags:
         - Module
@@ -232,8 +273,22 @@ paths:
                 example: Un langage javascript pour réaliser des API REST
               idCreator:
                 type: string
-        404:
-          description: Cours non existant
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: nom de la ressources non trouvée
+                example: module not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
     delete:
       tags:
         - Module
@@ -256,7 +311,21 @@ paths:
         403:
           description: Impossible de supprimer le cours sélectionné
         404:
-          description: Cours non trouvé
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: nom de la ressources non trouvée
+                example: path not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
   /path:
     put:
       tags:
@@ -285,20 +354,14 @@ paths:
 
 
       responses:
-        '200':
+        '201':
           description: le parcours a été ajouté avec succès
-        '401':
-          description: Erreur d'authentification
-        '403':
-          description: accès interdit
-        '404':
-          description: ressource non trouvée
         '500':
           description: une erreur s'est produite pendant la connexion au serveur
           schema:
             type: object
             properties:
-              not-found:
+              error:
                 type: string
                 description: nom de la ressources non trouvée
                 example: path
@@ -306,7 +369,6 @@ paths:
       tags:
         - Path
       summary: Donne la liste de tous les parcours
-
 
       responses:
         '200':
@@ -351,7 +413,6 @@ paths:
           in: header
           required: true
 
-
       responses:
         '200':
           description: le parcours a été modifié avec succès
@@ -359,17 +420,28 @@ paths:
           description: Erreur d'authentification
         '403':
           description: Impossible de modifier le parcours sélectionné
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: your are the owner
         '404':
           description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: path not found
         '500':
           description: une erreur s'est produite pendant la connexion au serveur
           schema:
             type: object
             properties:
-              not-found:
+              error:
                 type: string
                 description: nom de la ressources non trouvée
-                example: path
     get:
       tags:
         - Path
@@ -407,18 +479,21 @@ paths:
                       example: Un langage javascript pour réaliser des API REST
                     idCreator:
                       type: string
-
         '404':
           description: ressource non trouvée
-        '405':
-          description: Méthode Non Autorisée
           schema:
             type: object
             properties:
-              not-found:
+              error:
                 type: string
-                description: nom de la ressources non trouvée
-                example: path
+                example: path not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
 
     delete:
       tags:
@@ -445,16 +520,29 @@ paths:
           description: Erreur d'authentification
         '403':
           description: Impossible de supprimer le parcours sélectionné
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: you are not the owner
         '404':
           description: ressource non trouvée
           schema:
             type: object
             properties:
-              not-found:
+              error:
                 type: string
                 description: nom de la ressources non trouvée
-                example: path
-  /ressource:
+                example: path not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
+  /path/{idPath}/Module/{idModule}/ressource:
     put:
       tags:
         - Ressource
@@ -486,6 +574,30 @@ paths:
           description: Ressources ajoutée avec succès
         401:
           description: Erreur d'authentification
+        '403':
+          description: Impossible de modifier le cours sélectionné
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: you are not the owner
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: nom de la ressources non trouvée
+                example: module not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
     get:
       tags:
         - Ressource
@@ -537,8 +649,30 @@ paths:
           description: Ressource modifiée avec succès
         401:
           description: Erreur d'authentification
-        403:
-          description: Impossible de modifier la requête
+        '403':
+          description: Impossible de modifier le cours sélectionné
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: you are not the owner
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: nom de la ressources non trouvée
+                example: module / resource not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
     get:
       tags:
         - Ressource
@@ -565,8 +699,23 @@ paths:
                 type: string
                 example: NodeJS
                 description: découverte de NodeJS
-        404:
-          description: Ressource non existante
+
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: nom de la ressources non trouvée
+                example: module / resource not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
     delete:
       tags:
         - Ressource
@@ -591,40 +740,30 @@ paths:
           description: Ressource supprimée avec succès
         401:
           description: Erreur d'authentification
-        403:
-          description: Impossible de supprimer la ressource
-        404:
-          description: Ressource non existante
-  /Module/findByKeyWord:
-    get:
-      tags:
-        - Module
-      parameters:
-        - name: keyWord
-          type: string
-          in: query
-          required: true
-      responses:
-        200:
-          description: Retourne la liste des cours contenant le mot recherché
+        '403':
+          description: Impossible de modifier le cours sélectionné
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                title:
-                  type: string
-                  example: NodeJS
-                description:
-                  type: string
-                  example: NodeJS, un framework JavaScrip
-                creator:
-                  type: string
-                path:
-                  type: string
-        404:
-          description: Aucun cours trouvé
-
+            type: object
+            properties:
+              error:
+                type: string
+                example: you are not the owner
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: nom de la ressources non trouvée
+                example: module / resource not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
 
 host: localhost:3000
 basePath: /api
