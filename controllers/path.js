@@ -154,13 +154,17 @@ exports.addModule = (req, res, next) => {
 
             Path.findOne({_id: req.params.idPath})
                 .then((path) => {
-                    module.idPath = path._id;
-                    path.date = Date.now();
-                    module.save()
-                        .then(() => path.save()
-                            .then(() => res.status(201).json())
-                            .catch((err) => res.status(500).json({error: err.message})))
-                        .catch((err) => res.status(501).json({error: err.message}))
+                    if (user._id !== path.idCreator) {
+                        res.status(403).json();
+                    } else {
+                        module.idPath = path._id;
+                        path.date = Date.now();
+                        module.save()
+                            .then(() => path.save()
+                                .then(() => res.status(201).json())
+                                .catch((err) => res.status(500).json({error: err.message})))
+                            .catch((err) => res.status(501).json({error: err.message}))
+                    }
                 })
                 .catch((err) => res.status(404).json({error: err.message}))
         })
@@ -279,29 +283,32 @@ exports.getOneModule = (req, res, next) => {
 exports.addResource = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
-            let resource = new Resource({
-                idCreator: user._id,
-                url: req.body.url,
-                title: req.body.title,
-                description: req.body.description,
-                date: Date.now()
-            })
             Module.findOne({_id: req.params.idModule})
                 .then(module => {
-                    Path.findOne({_id: module.idPath})
-                        .then(path => {
-                            resource.idModule = module._id;
-                            module.date = Date.now();
-                            path.date = Date.now();
-                            resource.save()
-                                .then(() => module.save()
-                                    .then(() => path.save()
-                                        .then(() => res.status(201).json())
-                                        .catch((err) => res.status(500).json({error: err.message})))
-                                    .catch((err) => res.status(501).json({error: err.message})))
-                                .catch((err) => res.status(502).json({error: err.message}))
-                        })
-                        .catch((error) => res.status(404).json({error: error.message}));
+                    if (user._id !== module.idCreator) {
+                        res.status(403).json();
+                    } else {
+                        Path.findOne({_id: module.idPath})
+                            .then(path => {
+                                let resource = new Resource({
+                                    idModule: module._id,
+                                    idCreator: user._id,
+                                    url: req.body.url,
+                                    title: req.body.title,
+                                    description: req.body.description,
+                                    date: Date.now()
+                                })
+                                path.date = Date.now();
+                                resource.save()
+                                    .then(() => module.save()
+                                        .then(() => path.save()
+                                            .then(() => res.status(201).json())
+                                            .catch((err) => res.status(500).json({error: err.message})))
+                                        .catch((err) => res.status(501).json({error: err.message})))
+                                    .catch((err) => res.status(502).json({error: err.message}))
+                            })
+                            .catch((error) => res.status(404).json({error: error.message}));
+                    }
                 })
                 .catch((err) => res.status(405).json({error: err.message}))
         })
