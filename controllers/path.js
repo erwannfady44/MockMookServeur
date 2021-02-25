@@ -163,7 +163,7 @@ exports.addModule = (req, res) => {
                                         title: req.body.title,
                                         description: req.body.description,
                                         date: Date.now(),
-                                        position: position
+                                        position: position++
                                     })
                                     path.date = Date.now();
                                     module.save()
@@ -325,7 +325,7 @@ exports.addResource = (req, res) => {
                                                 title: req.body.title,
                                                 description: req.body.description,
                                                 date: Date.now(),
-                                                position: position
+                                                position: position++
                                             })
                                             module.date = Date.now();
                                             path.date = Date.now();
@@ -483,63 +483,63 @@ exports.cloneModule = async (req, res) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
                     if (path) {
-                    Module.findOne({_id: req.params.idModule})
-                        .then((module) => {
-                            if (module) {
-                                //vérification que le module n'existe pas déjà dans le parcours
-                                Module.findOne({idPath: req.params.idPath, title: module.title})
-                                    .then((exist) => {
-                                        if (exist)
-                                            res.status(409).json({error: 'module already exists'});
-                                        else {
-                                            Module.find({idPath: req.params.idPath}).count()
-                                                .then((position) => {
-                                                    const newModule = new Module({
-                                                        idPath: req.params.idPath,
-                                                        idCreator: user._id,
-                                                        title: module.title,
-                                                        description: module.description,
-                                                        date: new Date(),
-                                                        position: position,
-                                                    }).save().catch((err) => res.status(500).json({error: err.message}))
-                                                    //récupération de l'id du module
-                                                    Module.findOne({idPath: req.params.idPath, position: position})
-                                                        .then(newModule => {
-                                                            //récupération de la position
-                                                            Resource.find({idModule: module._id})
-                                                                .then(async position => {
-                                                                    async function cloneResources() {
-                                                                        Resource.find({idModule: module._id})
-                                                                            .then((resources) => {
-                                                                                resources.forEach(resource => {
-                                                                                    new Resource({
-                                                                                        idModule: newModule._id,
-                                                                                        idCreator: user._id,
-                                                                                        url: resource.url,
-                                                                                        title: resource.title,
-                                                                                        description: resource.description,
-                                                                                        date: new Date(),
-                                                                                        position: position++
-                                                                                    }).save().catch((err) => res.status(500).json({error: err.message}))
+                        Module.findOne({_id: req.params.idModule})
+                            .then((module) => {
+                                if (module) {
+                                    //vérification que le module n'existe pas déjà dans le parcours
+                                    Module.findOne({idPath: req.params.idPath, title: module.title})
+                                        .then((exist) => {
+                                            if (exist)
+                                                res.status(409).json({error: 'module already exists'});
+                                            else {
+                                                Module.find({idPath: req.params.idPath}).count()
+                                                    .then((position) => {
+                                                        const newModule = new Module({
+                                                            idPath: req.params.idPath,
+                                                            idCreator: user._id,
+                                                            title: module.title,
+                                                            description: module.description,
+                                                            date: new Date(),
+                                                            position: position++,
+                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
+                                                        //récupération de l'id du module
+                                                        Module.findOne({idPath: req.params.idPath, position: position})
+                                                            .then(newModule => {
+                                                                //récupération de la position
+                                                                Resource.find({idModule: module._id})
+                                                                    .then(async position => {
+                                                                        async function cloneResources() {
+                                                                            Resource.find({idModule: module._id})
+                                                                                .then((resources) => {
+                                                                                    resources.forEach(resource => {
+                                                                                        new Resource({
+                                                                                            idModule: newModule._id,
+                                                                                            idCreator: user._id,
+                                                                                            url: resource.url,
+                                                                                            title: resource.title,
+                                                                                            description: resource.description,
+                                                                                            date: new Date(),
+                                                                                            position: position++
+                                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
 
+                                                                                    })
                                                                                 })
-                                                                            })
-                                                                    }
+                                                                        }
 
-                                                                    await cloneResources();
-                                                                    Path.findOne({_id: module.idPath})
-                                                                        .then(path => {
-                                                                            path.updateOne({date: new Date()})
-                                                                                .then(() => res.status(200).json({}))
-                                                                                .catch((err) => res.status(500).json({error: err.message}))
-                                                                        })
-                                                                })
-                                                        })
-                                                })
-                                        }
-                                    })
-                            } else res.status(404).json({error: 'module not found'});
-                        })
+                                                                        await cloneResources();
+                                                                        Path.findOne({_id: module.idPath})
+                                                                            .then(path => {
+                                                                                path.updateOne({date: new Date()})
+                                                                                    .then(() => res.status(200).json({}))
+                                                                                    .catch((err) => res.status(500).json({error: err.message}))
+                                                                            })
+                                                                    })
+                                                            })
+                                                    })
+                                            }
+                                        })
+                                } else res.status(404).json({error: 'module not found'});
+                            })
                     } else res.status(404).json({error: 'path not found'});
 
                 }).catch((err) => res.status(500).json({error: err.message}))
