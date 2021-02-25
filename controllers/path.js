@@ -121,9 +121,8 @@ exports.getOne = (req, res, next) => {
         .catch((error) => res.status(404).json({error: error.message}));
 }
 
-
 exports.delete = (req, res, next) => {
-    User.findOne({_id: req.body.idUser})
+    User.findOne({_id: req.query.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
@@ -203,8 +202,9 @@ exports.editModule = (req, res, next) => {
         })
         .catch((error) => res.status(401).json({error: error.message}));
 }
+
 exports.deleteModule = (req, res, next) => {
-    User.findOne({_id: req.body.idUser})
+    User.findOne({_id: req.query.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
@@ -405,7 +405,7 @@ exports.getOneResource = (req, res, next) => {
 }
 
 exports.deleteResource = (req, res, next) => {
-    User.findOne({_id: req.body.idUser})
+    User.findOne({_id: req.query.idUser})
         .then(user => {
             Module.findOne({_id: req.params.idModule})
                 .then(module => {
@@ -464,7 +464,7 @@ exports.cloneModule = async (req, res, next) => {
                 .then((module) => {
                     if (module) {
                         //vérification que le module n'existe pas déjà dans le parcours
-                        Module.find({idPath: req.params.idPath, title: module.title})
+                        Module.findOne({idPath: req.params.idPath, title: module.title})
                             .then((exist) => {
                                 if (exist)
                                     res.status(403).json({error: 'module already exist'});
