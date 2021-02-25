@@ -51,7 +51,7 @@ exports.edit = (req, res, next) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then((path) => {
-                    if (user._id !== path.idCreator) {
+                    if (!user._id.equals(path.idCreator)) {
                         res.status(403).json();
                     } else {
                         path.title = req.body.title;
@@ -127,7 +127,7 @@ exports.delete = (req, res, next) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
-                    if (user._id !== path.idCreator) {
+                    if (!user._id.equals(path.idCreator)) {
                         res.status(403).json();
                     } else {
                         Path.deleteOne({_id: path._id})
@@ -157,7 +157,7 @@ exports.addModule = (req, res, next) => {
 
                     Path.findOne({_id: req.params.idPath})
                         .then((path) => {
-                            if (user._id !== path.idCreator) {
+                            if (!user._id.equals(path.idCreator)) {
                                 res.status(403).json();
                             } else {
                                 module.idPath = path._id;
@@ -183,7 +183,7 @@ exports.editModule = (req, res, next) => {
                 .then(path => {
                     Module.findOne({_id: req.params.idModule})
                         .then((module) => {
-                            if (user._id !== module.idCreator) {
+                            if (!user._id.equals(module.idCreator)) {
                                 res.status(403).json();
                             } else {
                                 module.title = req.body.title;
@@ -210,7 +210,7 @@ exports.deleteModule = (req, res, next) => {
                 .then(path => {
                     Module.findOne({_id: req.params.idModule})
                         .then(module => {
-                            if (user._id !== module.idCreator) {
+                            if (!user._id.equals(module.idCreator)) {
                                 res.status(403).json();
                             } else {
                                 Module.deleteOne({_id: module._id})
@@ -288,31 +288,35 @@ exports.addResource = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
             Resource.find({idModule: req.params.idModule}).count()
-                .then(postion => {
-                    let resource = new Resource({
-                        idCreator: user._id,
-                        url: req.body.url,
-                        title: req.body.title,
-                        description: req.body.description,
-                        date: Date.now(),
-                        position: postion
-                    })
+                .then(position => {
                     Module.findOne({_id: req.params.idModule})
                         .then(module => {
-                            Path.findOne({_id: module.idPath})
-                                .then(path => {
-                                    resource.idModule = module._id;
-                                    module.date = Date.now();
-                                    path.date = Date.now();
-                                    resource.save()
-                                        .then(() => module.save()
-                                            .then(() => path.save()
-                                                .then(() => res.status(201).json())
-                                                .catch((err) => res.status(500).json({error: err.message})))
-                                            .catch((err) => res.status(501).json({error: err.message})))
-                                        .catch((err) => res.status(502).json({error: err.message}))
-                                })
-                                .catch((error) => res.status(404).json({error: error.message}));
+                            if (!user._id.equals(module.idCreator)) {
+                                res.status(403).json();
+                            } else {
+                                Path.findOne({_id: module.idPath})
+                                    .then(path => {
+                                        let resource = new Resource({
+                                            idModule: module._id,
+                                            idCreator: user._id,
+                                            url: req.body.url,
+                                            title: req.body.title,
+                                            description: req.body.description,
+                                            date: Date.now(),
+                                            position: position
+                                        })
+                                        module.date = Date.now();
+                                        path.date = Date.now();
+                                        resource.save()
+                                            .then(() => module.save()
+                                                .then(() => path.save()
+                                                    .then(() => res.status(201).json())
+                                                    .catch((err) => res.status(500).json({error: err.message})))
+                                                .catch((err) => res.status(501).json({error: err.message})))
+                                            .catch((err) => res.status(502).json({error: err.message}))
+                                    })
+                                    .catch((error) => res.status(404).json({error: error.message}));
+                            }
                         })
                         .catch((err) => res.status(405).json({error: err.message}))
                 })
@@ -357,7 +361,7 @@ exports.editResource = (req, res, next) => {
                         .then(path => {
                             Resource.findOne({_id: req.params.idResource})
                                 .then(resource => {
-                                    if (user._id !== resource.idCreator) {
+                                    if (!user._id.equals(resource.idCreator)) {
                                         res.status(403).json()
                                     } else {
                                         resource.url = req.body.url;
@@ -409,7 +413,7 @@ exports.deleteResource = (req, res, next) => {
                         .then(path => {
                             Resource.findOne({_id: req.params.idResource})
                                 .then(resource => {
-                                    if (user._id !== resource.idCreator) {
+                                    if (!user._id.equals(resource.idCreator)) {
                                         res.status(403).json();
                                     } else {
                                         Resource.deleteOne({_id: resource._id})
