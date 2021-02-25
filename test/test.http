@@ -1,9 +1,28 @@
+###  get
+GET /localhost:3000/api/path/60367077db58940514ed18bb/603672320426aa0bf4e340f9
+
+###
+
+GET /localhost:3000/api/path/60367077db58940514ed18bb
+
+###
+
 POST http://localhost:3000/api/user/signup
 Content-Type: application/json
 
 {
 "pseudo":"aa",
   "password": "aaa"
+}
+
+### addModule
+POST http://localhost:3000/api/path/603767601424d340a8afd9b0/module
+Content-Type: application/json
+
+{
+  "idUser": "603767561424d340a8afd9af",
+  "title": "aaa",
+  "description": "aaa"
 }
 
 
