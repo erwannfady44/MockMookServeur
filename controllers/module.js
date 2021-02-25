@@ -47,7 +47,8 @@ exports.findByKeyWord = (req, res, next) => {
         $or: [
             {"title": {$all: reg}},
             {"description": {$all: reg}}
-        ]
+        ],
+        $nor: [{idPath: req.query.idPath}]
     }).then(modules => res.status(200).json(modules))
         .catch(error => res.status(404).json({error: error.message}))
 }
