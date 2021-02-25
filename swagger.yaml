@@ -73,7 +73,7 @@ paths:
           description: mot de passe incorrecte
         '404':
           description: pseudo incorrecte
-  /Module:
+  /path/{idPath}/Module:
     put:
       tags:
         - Module
@@ -542,7 +542,7 @@ paths:
             properties:
               erreur:
                 type: string
-  /ressource:
+  /path/{idPath}/Module/{idModule}/ressource:
     put:
       tags:
         - Ressource
