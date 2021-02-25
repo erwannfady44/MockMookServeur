@@ -145,24 +145,28 @@ exports.delete = (req, res, next) => {
 exports.addModule = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            let module = new Module({
-                idCreator: user._id,
-                title: req.body.title,
-                description: req.body.description,
-                date: Date.now()
-            })
+            Module.find({}).count()
+                .then(position => {
+                    let module = new Module({
+                        idCreator: user._id,
+                        title: req.body.title,
+                        description: req.body.description,
+                        date: Date.now(),
+                        position: position
+                    })
 
-            Path.findOne({_id: req.params.idPath})
-                .then((path) => {
-                    module.idPath = path._id;
-                    path.date = Date.now();
-                    module.save()
-                        .then(() => path.save()
-                            .then(() => res.status(201).json())
-                            .catch((err) => res.status(500).json({error: err.message})))
-                        .catch((err) => res.status(501).json({error: err.message}))
+                    Path.findOne({_id: req.params.idPath})
+                        .then((path) => {
+                            module.idPath = path._id;
+                            path.date = Date.now();
+                            module.save()
+                                .then(() => path.save()
+                                    .then(() => res.status(201).json())
+                                    .catch((err) => res.status(500).json({error: err.message})))
+                                .catch((err) => res.status(501).json({error: err.message}))
+                        })
+                        .catch((err) => res.status(404).json({error: err.message}))
                 })
-                .catch((err) => res.status(404).json({error: err.message}))
         })
         .catch((err) => res.status(401).json({error: err.message}))
 }
@@ -403,7 +407,7 @@ exports.findByKeyWord = (req, res, next) => {
                 paths.forEach(path => {
                     if ((new RegExp("\\b" + keywords[i] + "\\b", "i").test(path.title))) {
                         results.push(keywords[i]);
-                        if (results.length >= 20){
+                        if (results.length >= 20) {
                             res.status(200).json({tab: results});
                         }
                     }
