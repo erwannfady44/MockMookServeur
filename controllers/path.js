@@ -145,7 +145,7 @@ exports.delete = (req, res, next) => {
 exports.addModule = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
-            Module.find({}).count()
+            Module.find({idPath: req.params.idPath}).count()
                 .then(position => {
                     let module = new Module({
                         idCreator: user._id,
@@ -287,7 +287,7 @@ exports.getOneModule = (req, res, next) => {
 exports.addResource = (req, res, next) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
-            Module.find({}).count()
+            Resource.find({idModule: req.params.idModule}).count()
                 .then(postion => {
                     let resource = new Resource({
                         idCreator: user._id,
