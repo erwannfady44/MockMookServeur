@@ -3,7 +3,7 @@ const Resource = require('../Models/Resource');
 const Module = require('../Models/module');
 const Path = require('../Models/Path');
 
-exports.add = (req, res, next) => {
+exports.add = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
             let path = new Path({
@@ -20,7 +20,7 @@ exports.add = (req, res, next) => {
         .catch((error) => res.status(500).json({error: error.message}));
 }
 
-exports.getAll = (req, res, next) => {
+exports.getAll = (req, res) => {
     Path.find({}).sort({date: -1})
         .then((paths) => {
             let json = [];
@@ -47,7 +47,7 @@ exports.getAll = (req, res, next) => {
         .catch((error) => res.status(500).json({error: error.message}));
 }
 
-exports.edit = (req, res, next) => {
+exports.edit = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
@@ -70,7 +70,7 @@ exports.edit = (req, res, next) => {
         .catch((error) => res.status(500).json({error: error.message}));
 }
 
-exports.getOne = (req, res, next) => {
+exports.getOne = (req, res) => {
     Path.findOne({_id: req.params.idPath})
         .then((path) => {
             if (path) {
@@ -126,7 +126,7 @@ exports.getOne = (req, res, next) => {
         .catch((error) => res.status(500).json({error: error.message}));
 }
 
-exports.delete = (req, res, next) => {
+exports.delete = (req, res) => {
     User.findOne({_id: req.query.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
@@ -146,7 +146,7 @@ exports.delete = (req, res, next) => {
         .catch(error => res.status(500).json({error: error.message}));
 }
 
-exports.addModule = (req, res, next) => {
+exports.addModule = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
@@ -181,7 +181,7 @@ exports.addModule = (req, res, next) => {
         .catch((err) => res.status(500).json({error: err.message}))
 }
 
-exports.editModule = (req, res, next) => {
+exports.editModule = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
@@ -213,7 +213,7 @@ exports.editModule = (req, res, next) => {
         .catch((error) => res.status(500).json({error: error.message}));
 }
 
-exports.deleteModule = (req, res, next) => {
+exports.deleteModule = (req, res) => {
     User.findOne({_id: req.query.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
@@ -244,7 +244,7 @@ exports.deleteModule = (req, res, next) => {
         .catch((error) => res.status(500).json({error: error.message}));
 }
 
-exports.getOneModule = (req, res, next) => {
+exports.getOneModule = (req, res) => {
     Path.findOne({_id: req.params.idPath})
         .then(path => {
             if (path) {
@@ -305,7 +305,7 @@ exports.getOneModule = (req, res, next) => {
         })
 }
 
-exports.addResource = (req, res, next) => {
+exports.addResource = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
             Module.findOne({_id: req.params.idModule})
@@ -347,7 +347,7 @@ exports.addResource = (req, res, next) => {
         .catch((err) => res.status(500).json({error: err.message}))
 }
 
-exports.editResource = (req, res, next) => {
+exports.editResource = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
             Module.findOne({_id: req.params.idModule})
@@ -387,7 +387,7 @@ exports.editResource = (req, res, next) => {
         .catch((err) => res.status(500).json({error: err.message}))
 }
 
-exports.getOneResource = (req, res, next) => {
+exports.getOneResource = (req, res) => {
     Module.findOne({_id: req.params.idModule})
         .then(module => {
             if (module) {
@@ -411,7 +411,7 @@ exports.getOneResource = (req, res, next) => {
         .catch((err) => res.status(500).json({error: err.message}))
 }
 
-exports.deleteResource = (req, res, next) => {
+exports.deleteResource = (req, res) => {
     User.findOne({_id: req.query.idUser})
         .then(user => {
             Module.findOne({_id: req.params.idModule})
@@ -449,7 +449,7 @@ exports.deleteResource = (req, res, next) => {
         .catch((err) => res.status(500).json({error: err.message}))
 }
 
-exports.findByKeyWord = (req, res, next) => {
+exports.findByKeyWord = (req, res) => {
     const keyWords = req.query.keyWords.split(', ')
     const reg = [];
     keyWords.forEach(word => {
@@ -477,7 +477,7 @@ exports.findByKeyWord = (req, res, next) => {
         .catch(error => res.status(500).json({error: error.message}))
 }
 
-exports.cloneModule = async (req, res, next) => {
+exports.cloneModule = async (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
