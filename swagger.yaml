@@ -186,8 +186,58 @@ paths:
                   type: string
                 path:
                   type: string
-        404:
-          description: Aucun cours trouvé
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
+  /path/{idPath}/{idModule}/clone:
+    post:
+      tags:
+        - Module
+      summary: Clone un module
+      parameters:
+        - name: idUser
+          type: string
+          in: body
+          required: true
+        - name: token
+          type: string
+          in: header
+          required: true
+          description: token d'authentification
+      responses:
+        200:
+          description: clonage réalisé avec succès
+        401:
+          description: erreur d'authenfication
+        '403':
+          description: Impossible de modifier le cours sélectionné
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: you are not the owner
+        '404':
+          description: ressource non trouvée
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: nom de la ressources non trouvée
+                example: module / path not found
+        '500':
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              erreur:
+                type: string
+
   /Module/{idModule}:
     put:
       tags:

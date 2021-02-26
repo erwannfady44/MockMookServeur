@@ -18,7 +18,7 @@ router.post('/:idPath/:idModule/clone', auth, pathController.cloneModule);
 router.put('/:idModule/resource', auth, pathController.addResource);
 router.post('/:idModule/:idResource', auth, pathController.editResource);
 router.get('/:idModule/:idResource', pathController.getOneResource);
-router.get('/:idModule/:idResource', auth, pathController.deleteResource);
+router.delete('/:idModule/:idResource', auth, pathController.deleteResource);
 
 router.get('/findByKeyWord', pathController.findByKeyWord);
 
