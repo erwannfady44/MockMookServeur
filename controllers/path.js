@@ -46,6 +46,7 @@ exports.getAll = (req, res) => {
             }
 
             res.status(200).json({json});
+
         })
         .catch((error) => res.status(500).json({error: error.message}));
 }
@@ -97,11 +98,15 @@ exports.getOne = (req, res) => {
                                 } else {
                                     let tab = [];
 
-                                    async function get() {
-                                        modules.forEach(module => {
+                                    for (const module of modules) {
+                                        tab.push(await get(module));
+                                    }
+
+                                    async function get(module) {
+                                        return new Promise(resolve => {
                                             User.findOne({_id: module.idCreator})
                                                 .then((user) => {
-                                                    tab.push({
+                                                    resolve({
                                                         idModule: module._id,
                                                         title: module.title,
                                                         description: module.description,
@@ -114,7 +119,6 @@ exports.getOne = (req, res) => {
                                         })
                                     }
 
-                                    await get();
                                     res.status(200).json({
                                         idPath: path._id,
                                         title: path.title,
