@@ -69,7 +69,7 @@ exports.edit = (req, res) => {
                             Module.find({idPath: path._id})
                                 .then(modules => {
                                     modules.forEach(module => {
-                                        newPath.modules.findOne({_id: module._id})
+                                        newPath.modules.newPath.modules.findOne({_id: module._id})
                                             .then(newModule => {
                                                 if (newModule) {
                                                     if (module.title !== newModule.title || module.description !== newModule.description) {
@@ -608,20 +608,24 @@ exports.cloneModule = async (req, res) => {
                                                                             description: module.description,
                                                                             date: new Date(),
                                                                             position: position + 1,
-                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
-                                                                        //récupération de l'id du module
-                                                                        Module.findOne({
-                                                                            idPath: req.body.idPath2,
-                                                                            position: position + 1
-                                                                        })
+                                                                        }).save()
                                                                             .then(newModule => {
-                                                                                //récupération de la position
-                                                                                Resource.find({idModule: newModule._id}).count()
-                                                                                    .then(async position => {
-                                                                                        async function cloneResources() {
-                                                                                            Resource.find({idModule: module._id})
-                                                                                                .then((resources) => {
-                                                                                                    resources.forEach(resource => {
+                                                                                Module.findOne({
+                                                                                    idPath: req.body.idPath2,
+                                                                                    position: position
+                                                                                })
+                                                                                    .then(newModule => {
+                                                                                        Resource.find({idModule: newModule._id}).count()
+                                                                                            .then(async position => {
+                                                                                                Resource.find({idModule: module._id})
+                                                                                                    .then((resources) => {
+                                                                                                        resources.forEach(async resource => {
+                                                                                                            await cloneResources(resource);
+                                                                                                        })
+                                                                                                    })
+
+                                                                                                async function cloneResources(resource) {
+                                                                                                    return new Promise(resolve => {
                                                                                                         new Resource({
                                                                                                             idModule: newModule._id,
                                                                                                             idCreator: user._id,
@@ -630,17 +634,17 @@ exports.cloneModule = async (req, res) => {
                                                                                                             description: resource.description,
                                                                                                             date: new Date(),
                                                                                                             position: position + 1
-                                                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
-
+                                                                                                        }).save()
+                                                                                                            .then(() => resolve())
+                                                                                                            .catch((err) => res.status(500).json({error: err.message}))
                                                                                                     })
-                                                                                                })
-                                                                                        }
-
-                                                                                        await cloneResources();
-                                                                                        Path.findOne({_id: newModule.idPath})
-                                                                                            .then(path => {
-                                                                                                path.updateOne({date: new Date()})
-                                                                                                    .then(() => res.status(200).json({}))
+                                                                                                }
+                                                                                                Path.findOne({_id: newModule.idPath})
+                                                                                                    .then(path => {
+                                                                                                        path.updateOne({date: new Date()})
+                                                                                                            .then(() => res.status(200).json({}))
+                                                                                                            .catch((err) => res.status(500).json({error: err.message}))
+                                                                                                    })
                                                                                                     .catch((err) => res.status(500).json({error: err.message}))
                                                                                             })
                                                                                             .catch((err) => res.status(500).json({error: err.message}))
@@ -648,6 +652,8 @@ exports.cloneModule = async (req, res) => {
                                                                                     .catch((err) => res.status(500).json({error: err.message}))
                                                                             })
                                                                             .catch((err) => res.status(500).json({error: err.message}))
+                                                                        //récupération de l'id du module
+
                                                                     })
                                                                     .catch((err) => res.status(500).json({error: err.message}))
                                                             }
