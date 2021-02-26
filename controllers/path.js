@@ -52,7 +52,9 @@ exports.edit = (req, res) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then((path) => {
-                    if (path) {
+                    if (!path) {
+                        res.status(404).json({error: 'Path not found'});
+                    } else {
                         if (!user._id.equals(path.idCreator)) {
                             res.status(403).json({error: "You're not the owner"});
                         } else {
@@ -63,7 +65,7 @@ exports.edit = (req, res) => {
                                 .then(() => res.status(200).json())
                                 .catch((err) => res.status(500).json({error: err.message}))
                         }
-                    } else res.status(404).json({error: 'Path not found'});
+                    }
                 })
                 .catch((error) => res.status(500).json({error: error.message}));
         })
@@ -73,7 +75,9 @@ exports.edit = (req, res) => {
 exports.getOne = (req, res) => {
     Path.findOne({_id: req.params.idPath})
         .then((path) => {
-            if (path) {
+            if (!path) {
+                res.status(404).json({error: 'Path not found'});
+            } else {
                 User.findOne({_id: path.idCreator})
                     .then((user_path) => {
                         Module.find({idPath: req.params.idPath})
@@ -121,7 +125,7 @@ exports.getOne = (req, res) => {
                             })
                             .catch((error) => res.status(500).json({error: error.message}));
                     })
-            } else res.status(404).json({error: 'Path not found'});
+            }
         })
         .catch((error) => res.status(500).json({error: error.message}));
 }
@@ -131,7 +135,9 @@ exports.delete = (req, res) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
-                    if (path) {
+                    if (!path) {
+                        res.status(404).json({error: 'Path not found'});
+                    } else {
                         if (!user._id.equals(path.idCreator)) {
                             res.status(403).json({error: "You're not the owner"});
                         } else {
@@ -139,7 +145,7 @@ exports.delete = (req, res) => {
                                 .then(() => res.status(200).json())
                                 .catch((err) => res.status(500).json({error: err.message}))
                         }
-                    } else res.status(404).json({error: 'Path not found'});
+                    }
                 })
                 .catch(error => res.status(500).json({error: error.message}));
         })
@@ -151,7 +157,9 @@ exports.addModule = (req, res) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then((path) => {
-                    if (path) {
+                    if (!path) {
+                        res.status(404).json({error: 'Path not found'});
+                    } else {
                         Module.find({idPath: req.params.idPath}).count()
                             .then(position => {
                                 if (!user._id.equals(path.idCreator)) {
@@ -174,7 +182,7 @@ exports.addModule = (req, res) => {
                                 }
                             })
                             .catch((err) => res.status(500).json({error: err.message}))
-                    } else res.status(404).json({error: 'Path not found'});
+                    }
                 })
                 .catch((err) => res.status(500).json({error: err.message}))
         })
@@ -186,10 +194,14 @@ exports.editModule = (req, res) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
-                    if (path) {
+                    if (!path) {
+                        res.status(404).json({error: 'Path not found'});
+                    } else {
                         Module.findOne({_id: req.params.idModule})
                             .then((module) => {
-                                if (module) {
+                                if (!module) {
+                                    res.status(404).json({error: 'Module not found'});
+                                } else {
                                     if (!user._id.equals(module.idCreator)) {
                                         res.status(403).json({error: "You're not the owner"});
                                     } else {
@@ -203,10 +215,10 @@ exports.editModule = (req, res) => {
                                                 .catch((err) => res.status(500).json({error: err.message})))
                                             .catch((err) => res.status(500).json({error: err.message}))
                                     }
-                                } else res.status(404).json({error: 'Module not found'});
+                                }
                             })
                             .catch((error) => res.status(500).json({error: error.message}));
-                    } else res.status(404).json({error: 'Path not found'});
+                    }
                 })
                 .catch((error) => res.status(500).json({error: error.message}));
         })
@@ -218,10 +230,14 @@ exports.deleteModule = (req, res) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
-                    if (path) {
+                    if (!path) {
+                        res.status(404).json({error: 'Path not found'});
+                    } else {
                         Module.findOne({_id: req.params.idModule})
                             .then(module => {
-                                if (module) {
+                                if (!module) {
+                                    res.status(404).json({error: 'Module not found'});
+                                } else {
                                     if (!user._id.equals(module.idCreator)) {
                                         res.status(403).json({error: "You're not the owner"});
                                     } else {
@@ -234,10 +250,10 @@ exports.deleteModule = (req, res) => {
                                             })
                                             .catch((err) => res.status(500).json({error: err.message}))
                                     }
-                                } else res.status(404).json({error: 'Module not found'});
+                                }
                             })
                             .catch((error) => res.status(500).json({error: error.message}));
-                    } else res.status(404).json({error: 'Path not found'});
+                    }
                 })
                 .catch((error) => res.status(500).json({error: error.message}));
         })
@@ -247,15 +263,30 @@ exports.deleteModule = (req, res) => {
 exports.getOneModule = (req, res) => {
     Path.findOne({_id: req.params.idPath})
         .then(path => {
-            if (path) {
+            if (!path) {
+                res.status(404).json({error: 'Path not found'});
+            } else {
                 Module.findOne({_id: req.params.idModule})
                     .then((module) => {
-                        if (module) {
+                        if (!module) {
+                            res.status(404).json({error: 'Module not found'});
+                        } else {
                             User.findOne({_id: module.idCreator})
                                 .then(user => {
                                     Resource.find({idModule: req.params.idModule})
                                         .then(resources => {
-                                            if (resources.length !== 0) {
+                                            if (resources.length === 0) {
+                                                res.status(200).json({
+                                                    idModule: module._id,
+                                                    idPath: module.idPath,
+                                                    title: module.title,
+                                                    description: module.description,
+                                                    idCreator: module.idCreator,
+                                                    pseudo: user.pseudo,
+                                                    date: module.date,
+                                                    position: module.position
+                                                });
+                                            } else {
                                                 let tab = [];
                                                 let i = 0;
                                                 resources.forEach(resource => {
@@ -283,25 +314,14 @@ exports.getOneModule = (req, res) => {
                                                         });
                                                     }
                                                 })
-                                            } else {
-                                                res.status(200).json({
-                                                    idModule: module._id,
-                                                    idPath: module.idPath,
-                                                    title: module.title,
-                                                    description: module.description,
-                                                    idCreator: module.idCreator,
-                                                    pseudo: user.pseudo,
-                                                    date: module.date,
-                                                    position: module.position
-                                                });
                                             }
                                         })
                                         .catch((error) => res.status(500).json({error: error.message}));
                                 })
-                        } else res.status(404).json({error: 'module not found'});
+                        }
                     })
                     .catch((error) => res.status(500).json({error: error.message}));
-            } else res.status(404).json({error: 'Path not found'});
+            }
         })
 }
 
@@ -310,7 +330,9 @@ exports.addResource = (req, res) => {
         .then(user => {
             Module.findOne({_id: req.params.idModule})
                 .then(module => {
-                    if (module) {
+                    if (!module) {
+                        res.status(404).json({error: 'Module not found'});
+                    } else {
                         Resource.find({idModule: req.params.idModule}).count()
                             .then(position => {
                                 if (!user._id.equals(module.idCreator)) {
@@ -341,7 +363,7 @@ exports.addResource = (req, res) => {
                                 }
                             })
                             .catch((err) => res.status(500).json({error: err.message}))
-                    } else res.status(404).json({error: 'module not found'});
+                    }
                 })
         })
         .catch((err) => res.status(500).json({error: err.message}))
@@ -352,12 +374,16 @@ exports.editResource = (req, res) => {
         .then(user => {
             Module.findOne({_id: req.params.idModule})
                 .then(module => {
-                    if (module) {
+                    if (!module) {
+                        res.status(404).json({error: 'Module not found'});
+                    } else {
                         Path.findOne({_id: module.idPath})
                             .then(path => {
                                 Resource.findOne({_id: req.params.idResource})
                                     .then(resource => {
-                                        if (resource) {
+                                        if (!resource) {
+                                            res.status(404).json({error: 'Resource not found'});
+                                        } else {
                                             if (!user._id.equals(resource.idCreator)) {
                                                 res.status(403).json({error: "You're not the owner"});
                                             } else {
@@ -375,12 +401,12 @@ exports.editResource = (req, res) => {
                                                         .catch((err) => res.status(500).json({error: err.message})))
                                                     .catch((err) => res.status(500).json({error: err.message}))
                                             }
-                                        } else res.status(404).json({error: 'resource not found'});
+                                        }
                                     })
                                     .catch((err) => res.status(500).json({error: err.message}))
                             })
                             .catch((err) => res.status(500).json({error: err.message}))
-                    } else res.status(404).json({error: 'module not found'});
+                    }
                 })
                 .catch((err) => res.status(500).json({error: err.message}))
         })
@@ -390,7 +416,9 @@ exports.editResource = (req, res) => {
 exports.getOneResource = (req, res) => {
     Module.findOne({_id: req.params.idModule})
         .then(module => {
-            if (module) {
+            if (!module) {
+                res.status(404).json({error: 'Module not found'});
+            } else {
                 Resource.findOne({_id: req.params.idResource})
                     .then(resource => {
                         if (resource) {
@@ -403,10 +431,10 @@ exports.getOneResource = (req, res) => {
                                 date: resource.date,
                                 position: resource.position
                             });
-                        } else res.status(404).json({error: 'resource not found'});
+                        } else res.status(404).json({error: 'Resource not found'});
                     })
                     .catch((err) => res.status(500).json({error: err.message}))
-            } else res.status(404).json({error: 'module not found'});
+            }
         })
         .catch((err) => res.status(500).json({error: err.message}))
 }
@@ -416,12 +444,16 @@ exports.deleteResource = (req, res) => {
         .then(user => {
             Module.findOne({_id: req.params.idModule})
                 .then(module => {
-                    if (module) {
+                    if (!module) {
+                        res.status(404).json({error: 'Module not found'});
+                    } else {
                         Path.findOne({_id: module.idPath})
                             .then(path => {
                                 Resource.findOne({_id: req.params.idResource})
                                     .then(resource => {
-                                        if (resource) {
+                                        if (!resource) {
+                                            res.status(404).json({error: 'Resource not found'});
+                                        } else {
                                             if (!user._id.equals(resource.idCreator)) {
                                                 res.status(403).json({error: "You're not the owner"});
                                             } else {
@@ -437,12 +469,12 @@ exports.deleteResource = (req, res) => {
                                                     })
                                                     .catch((err) => res.status(500).json({error: err.message}))
                                             }
-                                        } else res.status(404).json({error: 'resource not found'});
+                                        }
                                     })
                                     .catch((err) => res.status(500).json({error: err.message}))
                             })
                             .catch((err) => res.status(500).json({error: err.message}))
-                    } else res.status(404).json({error: 'module not found'});
+                    }
                 })
                 .catch((err) => res.status(500).json({error: err.message}))
         })
@@ -482,65 +514,80 @@ exports.cloneModule = async (req, res) => {
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
                 .then(path => {
-                    if (path) {
+                    if (!path) {
+                        res.status(404).json({error: 'Path not found'});
+                    } else {
                         Module.findOne({_id: req.params.idModule})
                             .then((module) => {
-                                if (module) {
-                                    //vérification que le module n'existe pas déjà dans le parcours
-                                    Module.findOne({idPath: req.params.idPath, title: module.title})
-                                        .then((exist) => {
-                                            if (exist)
-                                                res.status(409).json({error: 'module already exists'});
-                                            else {
-                                                Module.find({idPath: req.params.idPath}).count()
-                                                    .then((position) => {
-                                                        const newModule = new Module({
-                                                            idPath: req.params.idPath,
-                                                            idCreator: user._id,
-                                                            title: module.title,
-                                                            description: module.description,
-                                                            date: new Date(),
-                                                            position: position + 1,
-                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
-                                                        //récupération de l'id du module
-                                                        Module.findOne({idPath: req.params.idPath, position: position})
-                                                            .then(newModule => {
-                                                                //récupération de la position
-                                                                Resource.find({idModule: module._id})
-                                                                    .then(async position => {
-                                                                        async function cloneResources() {
-                                                                            Resource.find({idModule: module._id})
-                                                                                .then((resources) => {
-                                                                                    resources.forEach(resource => {
-                                                                                        new Resource({
-                                                                                            idModule: newModule._id,
-                                                                                            idCreator: user._id,
-                                                                                            url: resource.url,
-                                                                                            title: resource.title,
-                                                                                            description: resource.description,
-                                                                                            date: new Date(),
-                                                                                            position: position + 1
-                                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
+                                if (!module) {
+                                    res.status(404).json({error: 'Module not found'});
+                                } else {
+                                    Path.findOne({_id: req.body.idPath2})
+                                        .then(path2 => {
+                                            if (!path2) {
+                                                res.status(404).json({error: 'Path2 not found'});
+                                            } else {
+                                                if (!user._id.equals(path2.idCreator)) {
+                                                    res.status(403).json({error: "You're not the owner"});
+                                                } else {
+                                                    //vérification que le module n'existe pas déjà dans le parcours
+                                                    Module.findOne({idPath: path2._id, title: module.title})
+                                                        .then((exist) => {
+                                                            if (exist) {
+                                                                res.status(409).json({error: 'Module already exists'});
+                                                            } else {
+                                                                Module.find({idPath: req.body.idPath2}).count()
+                                                                    .then((position) => {
+                                                                        new Module({
+                                                                            idPath: req.body.idPath2,
+                                                                            idCreator: user._id,
+                                                                            title: module.title,
+                                                                            description: module.description,
+                                                                            date: new Date(),
+                                                                            position: position + 1,
+                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
+                                                                        //récupération de l'id du module
+                                                                        Module.findOne({idPath: req.body.idPath2, position: position + 1})
+                                                                            .then(newModule => {
+                                                                                //récupération de la position
+                                                                                Resource.find({idModule: newModule._id}).count()
+                                                                                    .then(async position => {
+                                                                                        async function cloneResources() {
+                                                                                            Resource.find({idModule: module._id})
+                                                                                                .then((resources) => {
+                                                                                                    resources.forEach(resource => {
+                                                                                                        new Resource({
+                                                                                                            idModule: newModule._id,
+                                                                                                            idCreator: user._id,
+                                                                                                            url: resource.url,
+                                                                                                            title: resource.title,
+                                                                                                            description: resource.description,
+                                                                                                            date: new Date(),
+                                                                                                            position: position + 1
+                                                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
 
+                                                                                                    })
+                                                                                                })
+                                                                                        }
+
+                                                                                        await cloneResources();
+                                                                                        Path.findOne({_id: newModule.idPath})
+                                                                                            .then(path => {
+                                                                                                path.updateOne({date: new Date()})
+                                                                                                    .then(() => res.status(200).json({}))
+                                                                                                    .catch((err) => res.status(500).json({error: err.message}))
+                                                                                            })
                                                                                     })
-                                                                                })
-                                                                        }
-
-                                                                        await cloneResources();
-                                                                        Path.findOne({_id: module.idPath})
-                                                                            .then(path => {
-                                                                                path.updateOne({date: new Date()})
-                                                                                    .then(() => res.status(200).json({}))
-                                                                                    .catch((err) => res.status(500).json({error: err.message}))
                                                                             })
                                                                     })
-                                                            })
-                                                    })
+                                                            }
+                                                        })
+                                                }
                                             }
                                         })
-                                } else res.status(404).json({error: 'module not found'});
+                                }
                             })
-                    } else res.status(404).json({error: 'path not found'});
+                    }
 
                 }).catch((err) => res.status(500).json({error: err.message}))
         }).catch((err) => res.status(500).json({error: err.message}))

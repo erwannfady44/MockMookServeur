@@ -1,8 +1,9 @@
 const User = require('../Models/User');
+const Resource = require('../Models/Resource');
 const Module = require('../Models/module');
 const Path = require('../Models/Path');
 
-exports.clone = (req, res, next) => {
+exports.clone = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then(user => {
             Module.findOne({_id: req.params.idModule})
@@ -22,22 +23,60 @@ exports.clone = (req, res, next) => {
         .catch((err) => res.status(401).json({error: err.message}))
 }
 
-function cloneResource(id) {
-
+exports.cloneResource = (req, res) => {
+    User.findOne({_id: req.body.idUser})
+        .then(user => {
+            Module.findOne({_id: req.params.idModule})
+                .then(module => {
+                    if (!module) {
+                        res.status(404).json({error: "Module not found"})
+                    } else {
+                        Resource.findOne({_id: req.params.idResource})
+                            .then(resource => {
+                                if (!resource) {
+                                    res.status(404).json({error: "Resource not found"})
+                                } else {
+                                    Resource.findOne({idModule: req.body.idModule2, title: resource.title})
+                                        .then(exist => {
+                                            if (exist) {
+                                                res.status(404).json({error: "Resource already exists"})
+                                            } else {
+                                                Resource.find({idModule: req.body.idModule2}).count()
+                                                    .then(position => {
+                                                        new Resource({
+                                                            idModule: req.body.idModule2,
+                                                            idCreator: user._id,
+                                                            url: resource.url,
+                                                            title: resource.title,
+                                                            description: resource.description,
+                                                            date: new Date(),
+                                                            position: position + 1
+                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
+                                                    })
+                                                    .catch((err) => res.status(500).json({error: err.message}))
+                                            }
+                                        })
+                                        .catch((err) => res.status(500).json({error: err.message}))
+                                }
+                            })
+                            .catch((err) => res.status(500).json({error: err.message}))
+                    }
+                })
+                .catch((err) => res.status(500).json({error: err.message}))
+        })
+        .catch((err) => res.status(500).json({error: err.message}))
 }
 
 // Utile ?
-exports.getAll = (req, res, next) => {
+exports.getAll = (req, res) => {
     Module.find({})
         .then((modules) => {
             res.status(200).json({modules: modules});
         })
-        .catch(error => {
-            res.status(500).json({error: error.message});
-        })
+        .catch(error => res.status(500).json({error: error.message}))
 }
 
-exports.findByKeyWord = (req, res, next) => {
+exports.findByKeyWord = (req, res) => {
     const keyWords = req.query.keyWords.split(', ')
     const reg = [];
     keyWords.forEach(word => {
