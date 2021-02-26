@@ -446,6 +446,7 @@ exports.getOneResource = (req, res) => {
                                 url: resource.url,
                                 title: resource.title,
                                 description: resource.description,
+                                idCreator: resource.idCreator,
                                 date: resource.date,
                                 position: resource.position
                             });
