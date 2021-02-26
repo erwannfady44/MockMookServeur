@@ -25,11 +25,15 @@ exports.getAll = (req, res) => {
         .then(async (paths) => {
             let json = [];
 
-            async function get() {
-                paths.forEach(path => {
+            for (const path of paths) {
+                json.push(await get(path));
+            }
+
+            async function get(path) {
+                return new Promise(resolve => {
                     User.findOne({_id: path.idCreator})
                         .then(user => {
-                            json.push({
+                            resolve({
                                 idPath: path._id,
                                 title: path.title,
                                 description: path.description,
@@ -41,9 +45,7 @@ exports.getAll = (req, res) => {
                 })
             }
 
-            await get();
             res.status(200).json({json});
-
         })
         .catch((error) => res.status(500).json({error: error.message}));
 }
