@@ -71,15 +71,19 @@ exports.edit = (req, res) => {
                                     modules.forEach(module => {
                                         newPath.modules.findOne({_id: module._id})
                                             .then(newModule => {
-                                                if (module.title !== newModule.title || module.description !== newModule.description) {
-                                                    module.date = Date.now();
+                                                if (newModule) {
+                                                    if (module.title !== newModule.title || module.description !== newModule.description) {
+                                                        module.date = Date.now();
+                                                    }
+                                                    module.updateOne({
+                                                        title: newModule.title,
+                                                        description: newModule.description,
+                                                        position: newModule.position
+                                                    })
+                                                        .catch((err) => res.status(500).json({error: err.message}))
+                                                } else {
+                                                    Module.deleteOne({_id: module._id})
                                                 }
-                                                module.updateOne({
-                                                    title: newModule.title,
-                                                    description: newModule.description,
-                                                    position: newModule.position
-                                                })
-                                                    .catch((err) => res.status(500).json({error: err.message}))
                                             })
                                     })
                                 })
