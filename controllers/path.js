@@ -62,9 +62,28 @@ exports.edit = (req, res) => {
                         if (!user._id.equals(path.idCreator)) {
                             res.status(403).json({error: "You're not the owner"});
                         } else {
-                            path.title = req.body.title;
-                            path.description = req.body.description;
+                            let newPath = req.body.path;
+                            path.title = newPath.title;
+                            path.description = newPath.description
                             path.date = Date.now();
+                            Module.find({idPath: path._id})
+                                .then(modules => {
+                                    modules.forEach(module => {
+                                        newPath.modules.findOne({_id: module._id})
+                                            .then(newModule => {
+                                                if (module.title !== newModule.title || module.description !== newModule.description) {
+                                                    module.date = Date.now();
+                                                }
+                                                module.updateOne({
+                                                    title: newModule.title,
+                                                    description: newModule.description,
+                                                    position: newModule.position
+                                                })
+                                                    .catch((err) => res.status(500).json({error: err.message}))
+                                            })
+                                    })
+                                })
+
                             path.save()
                                 .then(() => res.status(200).json())
                                 .catch((err) => res.status(500).json({error: err.message}))
