@@ -243,6 +243,15 @@ exports.deleteModule = (req, res) => {
                                     } else {
                                         Module.deleteOne({_id: module._id})
                                             .then(() => {
+                                                Module.find({idPath: path._id})
+                                                    .then((modules) => {
+                                                        modules.forEach(module2 => {
+                                                            if (module2.position > module.position){
+                                                                module2.position --
+                                                                module2.save().catch((err) => res.status(500).json({error: err.message}))
+                                                            }
+                                                        })
+                                                    })
                                                 path.date = Date.now();
                                                 path.save()
                                                     .then(() => res.status(200).json())
@@ -421,7 +430,9 @@ exports.getOneResource = (req, res) => {
             } else {
                 Resource.findOne({_id: req.params.idResource})
                     .then(resource => {
-                        if (resource) {
+                        if (!resource) {
+                            res.status(404).json({error: 'Resource not found'});
+                        } else {
                             res.status(200).json({
                                 idResource: resource._id,
                                 idModule: resource.idModule,
@@ -431,7 +442,7 @@ exports.getOneResource = (req, res) => {
                                 date: resource.date,
                                 position: resource.position
                             });
-                        } else res.status(404).json({error: 'Resource not found'});
+                        }
                     })
                     .catch((err) => res.status(500).json({error: err.message}))
             }
@@ -459,6 +470,15 @@ exports.deleteResource = (req, res) => {
                                             } else {
                                                 Resource.deleteOne({_id: resource._id})
                                                     .then(() => {
+                                                        Resource.find({idModule: module._id})
+                                                            .then((resources) => {
+                                                                resources.forEach(resource2 => {
+                                                                    if (resource2.position > resource.position){
+                                                                        resource2.position --
+                                                                        resource2.save().catch((err) => res.status(500).json({error: err.message}))
+                                                                    }
+                                                                })
+                                                            })
                                                         module.date = Date.now();
                                                         path.date = Date.now();
                                                         module.save()
@@ -547,7 +567,10 @@ exports.cloneModule = async (req, res) => {
                                                                             position: position + 1,
                                                                         }).save().catch((err) => res.status(500).json({error: err.message}))
                                                                         //récupération de l'id du module
-                                                                        Module.findOne({idPath: req.body.idPath2, position: position + 1})
+                                                                        Module.findOne({
+                                                                            idPath: req.body.idPath2,
+                                                                            position: position + 1
+                                                                        })
                                                                             .then(newModule => {
                                                                                 //récupération de la position
                                                                                 Resource.find({idModule: newModule._id}).count()
