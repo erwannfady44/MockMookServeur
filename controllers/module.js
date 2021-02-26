@@ -36,24 +36,36 @@ exports.cloneResource = (req, res) => {
                                 if (!resource) {
                                     res.status(404).json({error: "Resource not found"})
                                 } else {
-                                    Resource.findOne({idModule: req.body.idModule2, title: resource.title})
-                                        .then(exist => {
-                                            if (exist) {
-                                                res.status(404).json({error: "Resource already exists"})
+                                    Module.findOne({_id: req.body.idModule2})
+                                        .then(module2 => {
+                                            if (!module2){
+                                                res.status(404).json({error: 'Module2 not found'});
                                             } else {
-                                                Resource.find({idModule: req.body.idModule2}).count()
-                                                    .then(position => {
-                                                        new Resource({
-                                                            idModule: req.body.idModule2,
-                                                            idCreator: user._id,
-                                                            url: resource.url,
-                                                            title: resource.title,
-                                                            description: resource.description,
-                                                            date: new Date(),
-                                                            position: position + 1
-                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
-                                                    })
-                                                    .catch((err) => res.status(500).json({error: err.message}))
+                                                if (!user._id.equals(module2.idCreator)){
+                                                    res.status(403).json({error: "You're not the owner"});
+                                                } else {
+                                                    Resource.findOne({idModule: req.body.idModule2, title: resource.title})
+                                                        .then(exist => {
+                                                            if (exist) {
+                                                                res.status(409).json({error: "Resource already exists"})
+                                                            } else {
+                                                                Resource.find({idModule: req.body.idModule2}).count()
+                                                                    .then(position => {
+                                                                        new Resource({
+                                                                            idModule: req.body.idModule2,
+                                                                            idCreator: user._id,
+                                                                            url: resource.url,
+                                                                            title: resource.title,
+                                                                            description: resource.description,
+                                                                            date: new Date(),
+                                                                            position: position + 1
+                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
+                                                                    })
+                                                                    .catch((err) => res.status(500).json({error: err.message}))
+                                                            }
+                                                        })
+                                                        .catch((err) => res.status(500).json({error: err.message}))
+                                                }
                                             }
                                         })
                                         .catch((err) => res.status(500).json({error: err.message}))
