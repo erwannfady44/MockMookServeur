@@ -38,13 +38,16 @@ exports.cloneResource = (req, res) => {
                                 } else {
                                     Module.findOne({_id: req.body.idModule2})
                                         .then(module2 => {
-                                            if (!module2){
+                                            if (!module2) {
                                                 res.status(404).json({error: 'Module2 not found'});
                                             } else {
-                                                if (!user._id.equals(module2.idCreator)){
+                                                if (!user._id.equals(module2.idCreator)) {
                                                     res.status(403).json({error: "You're not the owner"});
                                                 } else {
-                                                    Resource.findOne({idModule: req.body.idModule2, title: resource.title})
+                                                    Resource.findOne({
+                                                        idModule: req.body.idModule2,
+                                                        title: resource.title
+                                                    })
                                                         .then(exist => {
                                                             if (exist) {
                                                                 res.status(409).json({error: "Resource already exists"})

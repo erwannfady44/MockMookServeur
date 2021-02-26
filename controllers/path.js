@@ -22,26 +22,27 @@ exports.add = (req, res) => {
 
 exports.getAll = (req, res) => {
     Path.find({}).sort({date: -1})
-        .then((paths) => {
+        .then(async (paths) => {
             let json = [];
-            // TODO : Optimiser
-            let i = 0;
-            paths.forEach(path => {
-                User.findOne({_id: path.idCreator})
-                    .then(user => {
-                        json.push({
-                            idPath: path._id,
-                            title: path.title,
-                            description: path.description,
-                            idCreator: user._id,
-                            pseudo: user.pseudo,
-                            date: path.date
-                        });
-                        i++;
-                        if (i === paths.length)
-                            res.status(200).json({json});
-                    })
-            })
+
+            async function get() {
+                paths.forEach(path => {
+                    User.findOne({_id: path.idCreator})
+                        .then(user => {
+                            json.push({
+                                idPath: path._id,
+                                title: path.title,
+                                description: path.description,
+                                idCreator: user._id,
+                                pseudo: user.pseudo,
+                                date: path.date
+                            });
+                        })
+                })
+            }
+
+            await get();
+            res.status(200).json({json});
 
         })
         .catch((error) => res.status(500).json({error: error.message}));
@@ -81,38 +82,8 @@ exports.getOne = (req, res) => {
                 User.findOne({_id: path.idCreator})
                     .then((user_path) => {
                         Module.find({idPath: req.params.idPath})
-                            .then((modules) => {
-                                if (modules.length !== 0) {
-                                    let tab = [];
-                                    // TODO : Optimiser
-                                    let i = 0;
-                                    modules.forEach(module => {
-                                        User.findOne({_id: module.idCreator})
-                                            .then((user) => {
-                                                tab.push({
-                                                    idModule: module._id,
-                                                    title: module.title,
-                                                    description: module.description,
-                                                    idCreator: user._id,
-                                                    pseudo: user.pseudo,
-                                                    date: module.date,
-                                                    position: module.position
-                                                })
-                                                i++;
-                                                if (i === modules.length) {
-                                                    res.status(200).json({
-                                                        idPath: path._id,
-                                                        title: path.title,
-                                                        description: path.description,
-                                                        idCreator: user_path._id,
-                                                        pseudo: user_path.pseudo,
-                                                        date: path.date,
-                                                        modules: tab
-                                                    });
-                                                }
-                                            })
-                                    })
-                                } else {
+                            .then(async (modules) => {
+                                if (modules.length === 0) {
                                     res.status(200).json({
                                         idPath: path._id,
                                         title: path.title,
@@ -121,6 +92,36 @@ exports.getOne = (req, res) => {
                                         pseudo: user_path.pseudo,
                                         date: path.date
                                     })
+                                } else {
+                                    let tab = [];
+
+                                    async function get() {
+                                        modules.forEach(module => {
+                                            User.findOne({_id: module.idCreator})
+                                                .then((user) => {
+                                                    tab.push({
+                                                        idModule: module._id,
+                                                        title: module.title,
+                                                        description: module.description,
+                                                        idCreator: user._id,
+                                                        pseudo: user.pseudo,
+                                                        date: module.date,
+                                                        position: module.position
+                                                    })
+                                                })
+                                        })
+                                    }
+
+                                    await get();
+                                    res.status(200).json({
+                                        idPath: path._id,
+                                        title: path.title,
+                                        description: path.description,
+                                        idCreator: user_path._id,
+                                        pseudo: user_path.pseudo,
+                                        date: path.date,
+                                        modules: tab
+                                    });
                                 }
                             })
                             .catch((error) => res.status(500).json({error: error.message}));
@@ -242,16 +243,20 @@ exports.deleteModule = (req, res) => {
                                         res.status(403).json({error: "You're not the owner"});
                                     } else {
                                         Module.deleteOne({_id: module._id})
-                                            .then(() => {
-                                                Module.find({idPath: path._id})
-                                                    .then((modules) => {
-                                                        modules.forEach(module2 => {
-                                                            if (module2.position > module.position){
-                                                                module2.position --
-                                                                module2.save().catch((err) => res.status(500).json({error: err.message}))
-                                                            }
+                                            .then(async () => {
+                                                async function decalePosition() {
+                                                    Module.find({idPath: path._id})
+                                                        .then((modules) => {
+                                                            modules.forEach(module2 => {
+                                                                if (module2.position > module.position) {
+                                                                    module2.position--
+                                                                    module2.save().catch((err) => res.status(500).json({error: err.message}))
+                                                                }
+                                                            })
                                                         })
-                                                    })
+                                                }
+
+                                                await decalePosition();
                                                 path.date = Date.now();
                                                 path.save()
                                                     .then(() => res.status(200).json())
@@ -283,7 +288,7 @@ exports.getOneModule = (req, res) => {
                             User.findOne({_id: module.idCreator})
                                 .then(user => {
                                     Resource.find({idModule: req.params.idModule})
-                                        .then(resources => {
+                                        .then(async resources => {
                                             if (resources.length === 0) {
                                                 res.status(200).json({
                                                     idModule: module._id,
@@ -297,32 +302,34 @@ exports.getOneModule = (req, res) => {
                                                 });
                                             } else {
                                                 let tab = [];
-                                                let i = 0;
-                                                resources.forEach(resource => {
-                                                    tab.push({
-                                                        idResource: resource._id,
-                                                        idModule: resource.idModule,
-                                                        url: resource.url,
-                                                        title: resource.title,
-                                                        description: resource.description,
-                                                        date: resource.date,
-                                                        position: resource.position
+
+                                                async function get() {
+                                                    resources.forEach(resource => {
+                                                        tab.push({
+                                                            idResource: resource._id,
+                                                            idModule: resource.idModule,
+                                                            url: resource.url,
+                                                            title: resource.title,
+                                                            description: resource.description,
+                                                            idCreator: resource.idCreator,
+                                                            date: resource.date,
+                                                            position: resource.position
+                                                        })
                                                     })
-                                                    i++;
-                                                    if (i === resources.length) {
-                                                        res.status(200).json({
-                                                            idModule: module._id,
-                                                            idPath: module.idPath,
-                                                            title: module.title,
-                                                            description: module.description,
-                                                            idCreator: module.idCreator,
-                                                            pseudo: user.pseudo,
-                                                            date: module.date,
-                                                            position: module.position,
-                                                            resources: tab
-                                                        });
-                                                    }
-                                                })
+                                                }
+
+                                                await get();
+                                                res.status(200).json({
+                                                    idModule: module._id,
+                                                    idPath: module.idPath,
+                                                    title: module.title,
+                                                    description: module.description,
+                                                    idCreator: module.idCreator,
+                                                    pseudo: user.pseudo,
+                                                    date: module.date,
+                                                    position: module.position,
+                                                    resources: tab
+                                                });
                                             }
                                         })
                                         .catch((error) => res.status(500).json({error: error.message}));
@@ -469,16 +476,22 @@ exports.deleteResource = (req, res) => {
                                                 res.status(403).json({error: "You're not the owner"});
                                             } else {
                                                 Resource.deleteOne({_id: resource._id})
-                                                    .then(() => {
-                                                        Resource.find({idModule: module._id})
-                                                            .then((resources) => {
-                                                                resources.forEach(resource2 => {
-                                                                    if (resource2.position > resource.position){
-                                                                        resource2.position --
-                                                                        resource2.save().catch((err) => res.status(500).json({error: err.message}))
-                                                                    }
+                                                    .then(async () => {
+                                                        async function decalePosition() {
+                                                            Resource.find({idModule: module._id})
+                                                                .then((resources) => {
+                                                                    resources.forEach(resource2 => {
+                                                                        if (resource2.position > resource.position) {
+                                                                            resource2.position--
+                                                                            resource2.save().catch((err) => res.status(500).json({error: err.message}))
+                                                                        }
+                                                                    })
                                                                 })
-                                                            })
+                                                                .catch((err) => res.status(500).json({error: err.message}))
+                                                        }
+
+                                                        await decalePosition();
+
                                                         module.date = Date.now();
                                                         path.date = Date.now();
                                                         module.save()
