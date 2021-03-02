@@ -9,9 +9,10 @@ const yaml = require('yamljs');
 const userRouter = require('./routes/user');
 const moduleRouter = require('./routes/module');
 const pathRouter = require('./routes/path');
+const tagRouter = require('./routes/tag');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = yaml.load('./swagger.yaml');
-
+const asyncLib = require('async');
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/user', userRouter);
 app.use('/api/module', moduleRouter);
 app.use('/api/path', pathRouter);
+app.use('/api/tag', tagRouter);
 app.use('/api-docs/', swaggerUi.serve);
 app.get('/api-docs/', swaggerUi.setup(swaggerDocument));
 

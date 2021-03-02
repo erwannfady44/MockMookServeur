@@ -1,7 +1,12 @@
+const asyncLib = require('async');
+
 const User = require('../Models/User');
 const Resource = require('../Models/Resource');
 const Module = require('../Models/module');
 const Path = require('../Models/Path');
+const Tag = require('../Models/Tag');
+const TagAssociation = require('../Models/TagAssociation');
+
 
 exports.add = (req, res) => {
     User.findOne({_id: req.body.idUser})
@@ -13,7 +18,52 @@ exports.add = (req, res) => {
                 date: Date.now()
             })
             path.save()
-                .then(() => res.status(201).json())
+                .then(async () => {
+                    if (req.body.tags) {
+                        for (let tag of req.body.tags) {
+                            await addTag(tag);
+                        }
+                        res.status(201).json();
+                        async function addTag(tag) {
+                            return new Promise(resolve => {
+                                Tag.findOne({name: tag.name})
+                                    .then(t => {
+                                        // si le tag n'existe pas
+                                        if (!t) {
+                                            t = new Tag({name: tag.name}).save()
+                                                .then((t) => {
+                                                    console.log(t);
+                                                    TagAssociation.findOne({
+                                                        idPath: path._id,
+                                                        idTag: t._id
+                                                    }).then(tagAssociation => {
+                                                        if (!tagAssociation) {
+                                                            new TagAssociation({
+                                                                idTag: t._id,
+                                                                idPath: path._id
+                                                            }).save().then(() => resolve())
+                                                        }
+                                                    })
+                                                })
+                                        } else {
+                                            TagAssociation.findOne({
+                                                idPath: path._id,
+                                                idTag: t._id
+                                            }).then(tagAssociation => {
+                                                if (!tagAssociation) {
+                                                    new TagAssociation({
+                                                        idTag: t._id,
+                                                        idPath: path._id
+                                                    }).save().then(() => resolve())
+                                                }
+                                            })
+                                        }
+                                    })
+                            })
+
+                        }
+                    }
+                })
                 .catch((error) => res.status(500).json({error: error.message}))
 
         })
@@ -69,7 +119,8 @@ exports.edit = (req, res) => {
                             Module.find({idPath: path._id})
                                 .then(modules => {
                                     modules.forEach(module => {
-                                        newPath.modules.newPath.modules.findOne({_id: module._id})
+                                        //TODO: refaire à la main
+                                        newPath.modules.findOne({_id: module._id})
                                             .then(newModule => {
                                                 if (newModule) {
                                                     if (module.title !== newModule.title || module.description !== newModule.description) {
@@ -99,59 +150,247 @@ exports.edit = (req, res) => {
         .catch((error) => res.status(500).json({error: error.message}));
 }
 
+exports.edit2 = (req, res) => {
+    asyncLib.waterfall([
+        (done) => {
+            User.findOne({_id: req.body.idUser})
+                .then(user => done(null, user))
+                .catch(error => res.status(500).json({error: error.message}))
+        },
+
+        (user, done) => {
+            if (!user) {
+                res.status(401).json({error: 'you are not connected'});
+            } else {
+                Path.findOne({_id: req.body.path.idPath})
+                    .then(path => done(null, user, path))
+                    .catch(error => res.status(500).json({error: error.message}))
+            }
+        },
+
+        (user, path, done) => {
+            if (!path) {
+                res.status(404).json({error: 'path not found'});
+            } else {
+                // vérification qu'on est bien le propriétaire
+                if (!path.idCreator.equals(user._id)) {
+                    res.status(403).json({error: 'you are not the owner'})
+                } else {
+                    // mise à jour du parcours
+                    path.updateOne({
+                        title: req.body.path.title,
+                        description: req.body.path.description,
+                        date: new Date()
+                    }).then(() => done(null, user, path))
+                        .catch(error => res.status(500).json({error: error.message}))
+                }
+            }
+        },
+        // traitement modules
+        async (user, path, done) => {
+            // si on envoie des modules
+            if (req.body.path.modules) {
+                // mise à jour des modules
+                for (module of req.body.path.modules) {
+                    await updateModule(module)
+                }
+
+                async function updateModule(module) {
+                    return new Promise(resolve => {
+                        Module.findOne({_id: module.idModule})
+                            .then(m => {
+                                m.updateOne({
+                                    title: module.title,
+                                    description: module.description,
+                                    position: module.position,
+                                    date: new Date()
+                                }).then(() => resolve())
+                                    .catch(error => res.status(500).json({error: error.message}))
+                            })
+                    })
+                }
+
+
+                // vérification suppression module
+                async function deleteModule() {
+                    return new Promise(resolve => {
+                        Module.find({idPath: path._id})
+                            .then(modules => {
+                                    // si des modules ont été supprimés
+                                    if (modules.length > req.body.path.modules.length) {
+                                        let idModulesSent = [];
+                                        let idModuleRegister = []
+
+                                        req.body.path.modules.forEach(m => {
+                                            idModulesSent.push(m.idModule);
+                                        });
+
+                                        modules.forEach(m => {
+                                            idModuleRegister.push(m._id)
+                                        });
+
+                                        // vérification suppression module
+                                        idModuleRegister.forEach(idModule => {
+                                            if (!idModulesSent.includes(idModule)) {
+                                                Module.deleteOne({_id: idModule}).catch(error => res.status(500).json({error: error.message}))
+                                            }
+                                        })
+                                    }
+                                    resolve()
+                                }
+                            )
+                    })
+                }
+
+            }
+        },
+        // traitement tags
+        (user, path, done) => {
+            TagAssociation.find({idPath: path._id})
+                .then(async allTags => {
+                    let tagRegister = []
+                    let tagSent = [];
+
+
+                    for (let t of allTags) {
+                        tagRegister.push(await getTagName(t))
+                    }
+
+                    async function getTagName(tag) {
+                        return new Promise(resolve => {
+                            Tag.findOne({_id: tag.idTag})
+                                .then(tagName => {
+                                    resolve(tagName.name)
+                                })
+                                .catch(error => res.status(500).json({error: error.message}))
+                        })
+                    }
+
+                    req.body.path.tags.forEach(t => tagSent.push(t.name));
+
+                    if (tagSent.join() === tagRegister.join())
+                        res.status(200).json();
+                    else {
+                        // vérification suppression
+                        for (const tag of tagRegister) {
+                            if (!tagSent.includes(tag)) {
+                                await deleteTag(tag);
+                            }
+                        }
+
+                        // vérification ajout
+                        for (const tag of tagSent) {
+                            if (!tagRegister.includes(tag)) {
+                                await addTag(tag)
+                            }
+                        }
+                    }
+
+                    async function deleteTag(tag) {
+                        return new Promise(resolve => {
+                            Tag.findOne({name: tag})
+                                .then(t => {
+                                    TagAssociation.deleteOne({
+                                        idPath: path._id,
+                                        idTag: t._id
+                                    }).then(() => resolve())
+                                        .catch(error => res.status(500).json({error: error.message}))
+                                }).catch(error => res.status(500).json({error: error.message}))
+                        })
+                    }
+
+                    async function addTag(tag) {
+                        return new Promise(resolve => {
+                            Tag.findOne({name: tag})
+                                .then(t => {
+                                    if (!t) {
+                                        t = new Tag({name: ("" + tag)})
+                                            .save()
+                                            .then(() => {
+                                                new TagAssociation({
+                                                    idPath: path._id,
+                                                    idTag: t._id
+                                                }).save().then(resolve).catch(error => res.status(500).json({error: error.message}))
+                                            })
+                                    } else {
+                                        new TagAssociation({
+                                            idPath: path._id,
+                                            idTag: t._id
+                                        }).save().then(resolve).catch(error => res.status(500).json({error: error.message}))
+                                    }
+                                })
+                        })
+                    }
+
+                    res.status(200).json();
+                })
+
+        }
+    ]).then(() => res.status(200).json())
+        .catch(error => res.status(500).json({error: error.message}))
+}
+
 exports.getOne = (req, res) => {
     Path.findOne({_id: req.params.idPath})
         .then((path) => {
             if (!path) {
                 res.status(404).json({error: 'Path not found'});
             } else {
+                let modules = [];
+                let tags = [];
                 User.findOne({_id: path.idCreator})
                     .then((user_path) => {
                         Module.find({idPath: req.params.idPath})
                             .then(async (modules) => {
-                                if (modules.length === 0) {
-                                    res.status(200).json({
-                                        idPath: path._id,
-                                        title: path.title,
-                                        description: path.description,
-                                        idCreator: user_path._id,
-                                        pseudo: user_path.pseudo,
-                                        date: path.date
-                                    })
-                                } else {
-                                    let tab = [];
-
+                                if (modules.length !== 0) {
                                     for (const module of modules) {
-                                        tab.push(await get(module));
+                                        modules.push(await get(module));
                                     }
+                                }
 
-                                    async function get(module) {
-                                        return new Promise(resolve => {
-                                            User.findOne({_id: module.idCreator})
-                                                .then((user) => {
-                                                    resolve({
-                                                        idModule: module._id,
-                                                        title: module.title,
-                                                        description: module.description,
-                                                        idCreator: user._id,
-                                                        pseudo: user.pseudo,
-                                                        date: module.date,
-                                                        position: module.position
-                                                    })
+                                async function get(module) {
+                                    return new Promise(resolve => {
+                                        User.findOne({_id: module.idCreator})
+                                            .then((user) => {
+                                                resolve({
+                                                    idModule: module._id,
+                                                    title: module.title,
+                                                    description: module.description,
+                                                    idCreator: user._id,
+                                                    pseudo: user.pseudo,
+                                                    date: module.date,
+                                                    position: module.position
                                                 })
-                                        })
-                                    }
+                                            })
+                                    })
+                                }
 
-                                    res.status(200).json({
-                                        idPath: path._id,
-                                        title: path.title,
-                                        description: path.description,
-                                        idCreator: user_path._id,
-                                        pseudo: user_path.pseudo,
-                                        date: path.date,
-                                        modules: tab
+                                TagAssociation.find({idPath: path._id})
+                                    .then(async allTag => {
+                                        for (let tag of allTag)
+                                            tags.push(await getTagName(tag));
+
+                                        res.status(200).json({
+                                            idPath: path._id,
+                                            title: path.title,
+                                            description: path.description,
+                                            idCreator: user_path._id,
+                                            pseudo: user_path.pseudo,
+                                            date: path.date,
+                                            modules: modules,
+                                            tags: tags
+                                        });
+                                    })
+
+                                async function getTagName(tagAssociation) {
+                                    return new Promise(resolve => {
+                                        Tag.findOne({_id: tagAssociation.idTag})
+                                            .then((tag) => resolve(tag))
+                                            .catch(error => res.status(500).json({error: error.message}))
                                     });
                                 }
+
+
                             })
                             .catch((error) => res.status(500).json({error: error.message}));
                     })
@@ -507,7 +746,7 @@ exports.deleteResource = (req, res) => {
                                             } else {
                                                 Resource.deleteOne({_id: resource._id})
                                                     .then(async () => {
-                                                        async function decalePosition() {
+                                                        async function changePosition() {
                                                             Resource.find({idModule: module._id})
                                                                 .then((resources) => {
                                                                     resources.forEach(resource2 => {
@@ -520,7 +759,7 @@ exports.deleteResource = (req, res) => {
                                                                 .catch((err) => res.status(500).json({error: err.message}))
                                                         }
 
-                                                        await decalePosition();
+                                                        await changePosition();
 
                                                         module.date = Date.now();
                                                         path.date = Date.now();
@@ -567,12 +806,12 @@ exports.findByKeyWord = (req, res) => {
                 date: path.date
             });
         })
-        res.status(200).json();
+        res.status(200).json(json);
     })
         .catch(error => res.status(500).json({error: error.message}))
 }
 
-exports.cloneModule = async (req, res) => {
+exports.cloneModule = (req, res) => {
     User.findOne({_id: req.body.idUser})
         .then((user) => {
             Path.findOne({_id: req.params.idPath})
@@ -674,3 +913,107 @@ exports.cloneModule = async (req, res) => {
 
 }
 
+exports.addTag = (req, res) => {
+    asyncLib.waterfall([
+        (done) => {
+            User.findOne({_id: req.body.idUser})
+                .then(user => done(null, user))
+                .catch(error => res.status(500).json({error: error.message}))
+        },
+
+        (user, done) => {
+            if (!user)
+                res.status(401).json({error: 'wrong idUser'})
+            else {
+                Path.findOne({_id: req.params.idPath})
+                    .then(path => done(null, user, path))
+                    .catch(error => res.status(500).json({error: error.message}))
+            }
+        },
+
+        (user, path, done) => {
+            if (!path) {
+                res.status(404).json({error: 'path not found'})
+            } else {
+                Tag.findOne({name: req.body.tagName})
+                    .then(tag => {
+                        if (tag) {
+                            done(null, user, path, tag)
+                        } else {
+                            new Tag({
+                                name: req.body.tagName
+                            }).save()
+                                .then(tag => done(null, user, path, tag))
+                                .catch(error => res.status(500).json({error: error.message}))
+                        }
+                    })
+            }
+        },
+
+        (user, path, tag, done) => {
+            TagAssociation.findOne({idPath: path._id, idTag: tag._id})
+                .then(exist => {
+                    if (exist)
+                        res.status(409).json({error: 'tag already add'})
+                    else {
+                        new TagAssociation({
+                            idPath: path._id,
+                            idTag: tag._id
+                        }).save()
+                            .then(done(tag))
+                            .catch(error => res.status(500).json({error: error.message}))
+                    }
+                })
+        }
+    ])
+        .then(tag => {
+                if (tag)
+                    res.status(201).json({})
+                else
+                    res.status(500).json({error: 'cannot add tag'})
+            }
+        ).catch(error => res.status(500).json({error: error.message}));
+}
+
+exports.getAllPathTag = (req, res) => {
+    asyncLib.waterfall([
+        (done) => {
+            Path.findOne({_id: req.params.idPath})
+                .then(path => done(null, path))
+                .catch(error => res.status(500).json({error: error.message}))
+        },
+
+        (path, done) => {
+            TagAssociation.find({idPath: path._id})
+                .then(tags => done(null, path, tags))
+                .catch(error => res.status(500).json({error: error.message}))
+        },
+
+        (path, tagAssociations, done) => {
+            let json = [];
+            tagAssociations.forEach(async tag => {
+                json.push(await getTag(tag));
+            })
+
+            function getTag(tagAssociation) {
+                return new Promise(resolve => {
+                    Tag.findOne({_id: tagAssociation.idTag})
+                        .then(tag => resolve(tag))
+                        .catch(error => res.status(500).json({error: error.message}))
+                });
+            }
+
+            done(json);
+        }
+    ])
+        .then(json => res.status(200).json(json))
+        .catch(error => res.status(500).json({error: error.message}))
+}
+
+exports.editPathTag = (req, res) => {
+
+}
+
+exports.deletePathTag = (req, res) => {
+
+}
