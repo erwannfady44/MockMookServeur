@@ -344,7 +344,7 @@ exports.getOne = (req, res) => {
             if (!path) {
                 res.status(404).json({error: 'Path not found'});
             } else {
-                let modules = [];
+                let jsonmodules = [];
                 let tags = [];
                 User.findOne({_id: path.idCreator})
                     .then((user_path) => {
@@ -352,7 +352,7 @@ exports.getOne = (req, res) => {
                             .then(async (modules) => {
                                 if (modules.length !== 0) {
                                     for (const module of modules) {
-                                        modules.push(await get(module));
+                                        jsonmodules.push(await get(module));
                                     }
                                 }
 
