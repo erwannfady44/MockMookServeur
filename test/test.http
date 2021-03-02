@@ -27,6 +27,9 @@ Content-Type: application/json
 
 
 ### getOnModule
-
 GET http://localhost:3000/api/path/6037c41b4c1fee0bd8b8a498
+
+### getAllPath
+GET http://localhost:3000/api/path
+
 

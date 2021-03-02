@@ -83,14 +83,31 @@ exports.getAll = (req, res) => {
                 return new Promise(resolve => {
                     User.findOne({_id: path.idCreator})
                         .then(user => {
-                            resolve({
-                                idPath: path._id,
-                                title: path.title,
-                                description: path.description,
-                                idCreator: user._id,
-                                pseudo: user.pseudo,
-                                date: path.date
-                            });
+                            const jsonTags = [];
+
+                            TagAssociation.find({idPath: path._id})
+                                .then(async tags => {
+                                    for (const tag of tags) {
+                                        jsonTags.push(await getTagName(tag))
+                                    }
+                                    resolve({
+                                        idPath: path._id,
+                                        title: path.title,
+                                        description: path.description,
+                                        idCreator: user._id,
+                                        pseudo: user.pseudo,
+                                        date: path.date,
+                                        tags: jsonTags
+                                    });
+
+                                    async function getTagName(tagAssociation) {
+                                        return new Promise(resolve => {
+                                            Tag.findOne({_id: tagAssociation.idTag})
+                                                .then((tag) => resolve(tag))
+                                                .catch(error => res.status(500).json({error: error.message}))
+                                        });
+                                    }
+                                })
                         })
                 })
             }
