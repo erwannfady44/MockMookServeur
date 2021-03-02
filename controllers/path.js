@@ -24,6 +24,7 @@ exports.add = (req, res) => {
                             await addTag(tag);
                         }
                         res.status(201).json();
+
                         async function addTag(tag) {
                             return new Promise(resolve => {
                                 Tag.findOne({name: tag.name})
@@ -32,7 +33,6 @@ exports.add = (req, res) => {
                                         if (!t) {
                                             t = new Tag({name: tag.name}).save()
                                                 .then((t) => {
-                                                    console.log(t);
                                                     TagAssociation.findOne({
                                                         idPath: path._id,
                                                         idTag: t._id
@@ -210,7 +210,6 @@ exports.edit2 = (req, res) => {
                     })
                 }
 
-
                 // vérification suppression module
                 async function deleteModule() {
                     return new Promise(resolve => {
@@ -245,22 +244,27 @@ exports.edit2 = (req, res) => {
             }
         },
         // traitement tags
-        (user, path, done) => {
-            TagAssociation.find({idPath: path._id})
+        (done) => {
+            TagAssociation.find({idPath: req.params.idPath})
                 .then(async allTags => {
                     let tagRegister = []
                     let tagSent = [];
-
 
                     for (let t of allTags) {
                         tagRegister.push(await getTagName(t))
                     }
 
+
                     async function getTagName(tag) {
                         return new Promise(resolve => {
                             Tag.findOne({_id: tag.idTag})
-                                .then(tagName => {
-                                    resolve(tagName.name)
+                                .then(t => {
+                                    TagAssociation.findOne({
+                                        idPath: req.params.idPath,
+                                        idTag: t._id
+                                    }).then(exist => {
+                                        resolve(exist ? t.name : null)
+                                    })
                                 })
                                 .catch(error => res.status(500).json({error: error.message}))
                         })
@@ -310,13 +314,17 @@ exports.edit2 = (req, res) => {
                                                 new TagAssociation({
                                                     idPath: path._id,
                                                     idTag: t._id
-                                                }).save().then(resolve).catch(error => res.status(500).json({error: error.message}))
+                                                }).save().then(tmp => {
+                                                    resolve();
+                                                }).catch(error => res.status(500).json({error: error.message}))
                                             })
                                     } else {
                                         new TagAssociation({
-                                            idPath: path._id,
+                                            idPath: req.params.idPath,
                                             idTag: t._id
-                                        }).save().then(resolve).catch(error => res.status(500).json({error: error.message}))
+                                        }).save().then(tmp => {
+                                            resolve()
+                                        }).catch(error => res.status(500).json({error: error.message}))
                                     }
                                 })
                         })
