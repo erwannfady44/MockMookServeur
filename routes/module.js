@@ -5,7 +5,6 @@ const auth = require('../controllers/auth');
 
 router.put('/:idModule', auth, moduleController.clone);
 router.get('/', moduleController.getAll);
-//router.get('/:idPath', moduleController.getModules);
 router.put('/:idModule/:idResource/clone', auth, moduleController.cloneResource);
 router.get('/findByKeyWords', moduleController.findByKeyWord);
 

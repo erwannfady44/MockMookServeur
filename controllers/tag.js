@@ -16,7 +16,7 @@ exports.findByKeyWords = (req, res) => {
     if (req.query.idPath) {
         Path.findOne({_id: req.query.idPath})
             .then(path => {
-                 found(path)
+                found(path)
             })
     } else
         found(null);
