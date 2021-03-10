@@ -23,6 +23,7 @@ exports.add = (req, res) => {
                         for (let tag of req.body.tags) {
                             await addTag(tag);
                         }
+                        user.updateOne({nbPath: user.nbPath+1});
                         res.status(201).json();
 
                         async function addTag(tag) {
@@ -445,7 +446,10 @@ exports.delete = (req, res) => {
                                             .catch((err) => res.status(500).json({error: err.message}))
                                     })
                                     Path.deleteOne({_id: path._id})
-                                        .then(() => res.status(200).json())
+                                        .then(() => {
+                                            user.updateOne({nbPath: user.nbPath-1});
+                                            res.status(200).json()
+                                        })
                                         .catch((err) => res.status(500).json({error: err.message}))
                                 })
                         }
@@ -477,10 +481,14 @@ exports.addModule = (req, res) => {
                                         date: Date.now(),
                                         position: position + 1
                                     })
-                                    path.date = Date.now();
+
                                     module.save()
                                         .then(() => path.save()
-                                            .then(() => res.status(201).json())
+                                            .then(() => {
+                                                path.date = Date.now();
+                                                user.updateOne({nbModule: user.nbModule+1});
+                                                res.status(201).json()
+                                            })
                                             .catch((err) => res.status(500).json({error: err.message})))
                                         .catch((err) => res.status(500).json({error: err.message}))
                                 }
@@ -563,6 +571,7 @@ exports.deleteModule = (req, res) => {
 
                                                         await decalePosition();
                                                         path.date = Date.now();
+                                                        user.updateOne({nbModule: user.nbModule-1});
                                                         path.save()
                                                             .then(() => res.status(200).json())
                                                             .catch((err) => res.status(500).json({error: err.message}))
@@ -718,6 +727,7 @@ exports.cloneModule = (req, res) => {
                                                                                         Path.findOne({_id: newModule.idPath})
                                                                                             .then(path => {
                                                                                                 path.updateOne({date: new Date()})
+                                                                                                user.updateOne({nbModule: user.nbModule+1})
                                                                                                     .then(() => res.status(200).json({}))
                                                                                                     .catch((err) => res.status(500).json({error: err.message}))
                                                                                             })

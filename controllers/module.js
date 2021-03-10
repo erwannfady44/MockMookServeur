@@ -29,6 +29,7 @@ exports.addResource = (req, res) => {
                                             })
                                             module.date = Date.now();
                                             path.date = Date.now();
+                                            user.updateOne({nbResource: user.nbResource+1});
                                             resource.save()
                                                 .then(() => module.save()
                                                     .then(() => path.save()
@@ -157,6 +158,7 @@ exports.deleteResource = (req, res) => {
 
                                                         module.date = Date.now();
                                                         path.date = Date.now();
+                                                        user.updateOne({nbResource: user.nbResource-1});
                                                         module.save()
                                                             .then(() => path.save()
                                                                 .then(() => res.status(200).json())
@@ -216,7 +218,12 @@ exports.cloneResource = (req, res) => {
                                                                             description: resource.description,
                                                                             date: new Date(),
                                                                             position: position + 1
-                                                                        }).save().catch((err) => res.status(500).json({error: err.message}))
+                                                                        }).save()
+                                                                            .then(() => {
+                                                                                user.updateOne({nbResource: user.nbResource+1});
+                                                                                res.status(200).json()
+                                                                            })
+                                                                            .catch((err) => res.status(500).json({error: err.message}))
                                                                     })
                                                                     .catch((err) => res.status(500).json({error: err.message}))
                                                             }
