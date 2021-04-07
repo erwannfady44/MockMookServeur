@@ -10,6 +10,8 @@ exports.signup = (req, res, next) => {
             const user = new User({
                 pseudo: req.body.pseudo,
                 password: hash,
+                lastConnection: Date.now(),
+                dateJoined: Date.now(),
                 status: 1
             });
             user.save()
@@ -43,6 +45,7 @@ exports.login = (req, res, next) => {
                         if (!valid) {
                             res.status(401).json({error: "wrong password"});
                         } else {
+                            user.updateOne({lastConnection: Date.now()})
                             res.status(200).json({
                                 idUser: user._id,
                                 status: user.status,
