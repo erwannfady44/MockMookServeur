@@ -64,6 +64,6 @@ app.use(function (err, req, res, next) {
 });
 
 
-mongoose.connect('mongodb://localhost:27017/mockmook', {useUnifiedTopology: true, useNewUrlParser: true});
+mongoose.connect('mongodb://localhost:27017/mockmooc', {useUnifiedTopology: true, useNewUrlParser: true});
 
 module.exports = app;

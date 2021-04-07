@@ -1,6 +1,6 @@
 const User = require('../Models/User');
 const Resource = require('../Models/Resource');
-const Module = require('../Models/module');
+const Module = require('../Models/Module');
 const Path = require('../Models/Path');
 
 exports.addResource = (req, res) => {
