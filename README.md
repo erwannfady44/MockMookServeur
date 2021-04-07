@@ -1,23 +1,12 @@
 # Serveur
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.1.1.
-
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change
-any of the source files.
+This project was generated with [Express](https://github.com/expressjs/express) version 4.17.1.
 
 ## Build
 
 ### Prerequisite
 
-*To be able to build the project you need to have [nodeJS (v14.15.4 or higher)](https://github.com/nodejs/node)
-and [npm (v6.14.10 or higher)](https://github.com/npm) installed.* \
-You will also need a NoSQL database like MongoDB. You can install this [here](https://github.com/mongodb/mongo).
+*To be able to build the project you need to have [nodeJS (v14.15.4 or higher)](https://github.com/nodejs/node), [npm (v6.14.10 or higher)](https://github.com/npm) installed.* \
+You will need a MongoDB server. You can install this [here](https://www.mongodb.com/try/download/community).
 
-Run `npm install` to build the project. Then, run `npm start`. Navigate to `http://localhost:4200/`.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out
-the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Run `npm install` to download the modules. Then, run `npm start`. Navigate to `http://localhost:3000/api-docs` to see the documentation of the server.
